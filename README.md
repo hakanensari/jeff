@@ -19,7 +19,7 @@ AWS endpoint.
 
 ```ruby
 client = Class.new.tap do |config|
-  config.endpoint = 'http://aws-url.com'
+  config.endpoint = 'http://aws-url.com/path'
   config.key      = 'key'
   config.secret   = 'secret'
 end
@@ -31,7 +31,7 @@ Make a chunked request.
 
 ```ruby
 file = File.open 'data'
-chunker = -> file.read Excon::CHUNK_SIZE).to_s
+chunker = -> { file.read Excon::CHUNK_SIZE).to_s }
 
 client.post request_block: chunker
 ```
