@@ -65,7 +65,7 @@ describe Jeff do
       subject { client.default_params }
 
       it 'should include the key' do
-        subject['AWSAccessKeyId'].should eql 'key'
+        subject['AWSAccessKeyId'].should eql client.key
       end
 
       it 'should generate a timestamp' do

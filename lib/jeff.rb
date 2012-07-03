@@ -1,5 +1,4 @@
 require 'base64'
-require 'forwardable'
 require 'time'
 
 require 'excon'
@@ -16,8 +15,6 @@ module Jeff
   SHA256 = OpenSSL::Digest::SHA256.new
   UNRESERVED = /([^\w.~-]+)/
 
-  def_delegator 'self.class', :headers, :default_headers
-
   def self.included(base)
     base.extend ClassMethods
   end
@@ -32,6 +29,11 @@ module Jeff
     self.class.params.reduce({}) do |a, (k, v)|
       a.update k => (v.is_a?(Proc) ? instance_eval(&v) : v)
     end
+  end
+
+  # Returns the Hash default headers.
+  def default_headers
+    self.class.headers
   end
 
   # Gets the String AWS endpoint.
