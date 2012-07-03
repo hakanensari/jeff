@@ -6,8 +6,6 @@ require 'excon'
 require 'jeff/version'
 
 module Jeff
-  extend Forwardable
-
   MissingEndpoint = Class.new ArgumentError
   MissingKey      = Class.new ArgumentError
   MissingSecret   = Class.new ArgumentError
