@@ -117,6 +117,10 @@ describe Jeff do
       it 'should set default headers' do
         headers.should eq klass.headers
       end
+
+      it 'should cache itself' do
+        subject.should be client.connection
+      end
     end
   end
 
