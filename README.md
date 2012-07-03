@@ -1,8 +1,10 @@
 # Jeff
 
-Jeff is a light-weight module that mixes in client behaviour for [Amazon Web
-Services (AWS)][aws]. It wraps [Excon][excon] and implements [Signature Version
-2][sign].
+**Jeff** is a light-weight module that mixes in client behaviour for [Amazon
+Web Services (AWS)][aws]. It wraps the HTTP adapter [Excon][excon] and
+implements [Signature Version 2][sign].
+
+![jeff][jeff]
 
 ## Usage
 
@@ -44,6 +46,31 @@ streamer = ->(chunk, remaining, total) { puts chunk }
 client.get response_block: streamer
 ```
 
-[aws]: http://aws.amazon.com/
+## DSL
+
+**Jeff** comes with a minimal DSL to set default headers and parameters.
+
+```ruby
+class Client
+  include Jeff
+
+  params 'AssociateTag' => Proc.new { tag },
+         'Service'      => 'SomeService'
+
+  attr_accessor :tag
+end
+```
+
+Use procs to populate dynamic values.
+
+```ruby
+client = Client.new
+client.tag = 'foo'
+
+client.default_params['Tag'] # => 'foo'
+```
+
+[aws]:   http://aws.amazon.com/
 [excon]: https://github.com/geemus/excon
-[sign]: http://docs.amazonwebservices.com/general/latest/gr/signature-version-2.html
+[sign]:  http://docs.amazonwebservices.com/general/latest/gr/signature-version-2.html
+[jeff]:  http://f.cl.ly/items/0a3R3J0k1R2f423k1q2l/jeff.jpg
