@@ -1,25 +1,49 @@
 # Jeff
 
-Jeff is a minimum-viable client for [Amazon Web Services (AWS) APIs][aws] that
-support [Signature Version 2][sign].
+Jeff is a light-weight module that mixes in client behaviour for [Amazon Web
+Services (AWS)][aws]. It wraps [Excon][excon] and implements [Signature Version
+2][sign].
 
 ## Usage
 
-```ruby
-client = Jeff.new 'http://some-aws-url.com/'
-client << params
-client << data
+Here's a hypothetical client.
 
-client.request
+```ruby
+class Client
+  include Jeff
+end
 ```
 
-Stream responses.
+By setting the minimum credentials, you should be able to access a compatible
+AWS endpoint.
 
 ```ruby
-client << ->(chunk, remaining, total) { puts chunk }
+client = Class.new.tap do |config|
+  config.endpoint = 'http://aws-url.com'
+  config.key      = 'key'
+  config.secret   = 'secret'
+end
 
-client.request
+client.post body: 'data'
+```
+
+Make a chunked request.
+
+```ruby
+file = File.open 'data'
+chunker = -> file.read Excon::CHUNK_SIZE).to_s
+
+client.post request_block: chunker
+```
+
+Stream a response.
+
+```ruby
+streamer = ->(chunk, remaining, total) { puts chunk }
+
+client.get response_block: streamer
 ```
 
 [aws]: http://aws.amazon.com/
+[excon]: https://github.com/geemus/excon
 [sign]: http://docs.amazonwebservices.com/general/latest/gr/signature-version-2.html

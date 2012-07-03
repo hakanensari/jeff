@@ -5,8 +5,8 @@ require File.expand_path('../lib/jeff/version.rb', __FILE__)
 Gem::Specification.new do |gem|
   gem.authors       = ['Hakan Ensari']
   gem.email         = ['hakan.ensari@papercavalier.com']
-  gem.description   = %q{A minimum-viable Amazon Web Services (AWS) client}
-  gem.summary       = %q{An AWS client}
+  gem.description   = %q{Minimum-viable Amazon Web Services (AWS) client}
+  gem.summary       = %q{AWS client}
   gem.homepage      = 'https://github.com/hakanensari/jeff'
 
   gem.files         = `git ls-files`.split($\)
@@ -16,7 +16,9 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
   gem.version       = Jeff::VERSION
 
-  gem.add_dependency             'excon', '~> 0.14'
-  gem.add_development_dependency 'rake',  '~> 0.9'
-  gem.add_development_dependency 'rspec', '~> 2.10'
+  gem.add_dependency             'excon', '~> 0.14.2'
+  gem.add_development_dependency 'guard-rspec'
+  gem.add_development_dependency 'pry'
+  gem.add_development_dependency 'rake'
+  gem.add_development_dependency 'rspec'
 end
