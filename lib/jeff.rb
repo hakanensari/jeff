@@ -75,7 +75,7 @@ module Jeff
     DEF
   end
 
-  # Internal: Builds a signed URL query.
+  # Internal: Builds a sorted query.
   #
   # hsh - A hash of parameters specific to request.
   #
