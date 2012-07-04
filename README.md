@@ -97,7 +97,7 @@ client.get query:        {},
            instrumentor: Logger
 ```
 
-For more detailed configuration options, check out [the excon README][excon].
+For more detailed configuration options, check out the [excon README][excon].
 
 [aws]:   http://aws.amazon.com/
 [excon]: https://github.com/geemus/excon
