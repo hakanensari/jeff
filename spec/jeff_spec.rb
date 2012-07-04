@@ -90,19 +90,6 @@ describe Jeff do
     end
   end
 
-  context 'given a key and a secret' do
-    before do
-      client.key = 'key'
-      client.secret = 'secret'
-    end
-
-    describe '#sign' do
-      subject { client.sign 'foo' }
-
-      it { should be_a String }
-    end
-  end
-
   context 'given an endpoint' do
     before do
       client.endpoint = 'http://slowapi.com/delay/0'

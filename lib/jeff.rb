@@ -70,14 +70,14 @@ module Jeff
     eval <<-DEF
       def #{method}(opts = {}, &block)
         opts.update method: :#{method}
-        request opts, &block
+        connection.request sign opts, &block
       end
     DEF
   end
 
   # Internal: Builds a sorted query.
   #
-  # hsh - A hash of parameters specific to request.
+  # hsh - A hash of query parameters specific to the request.
   #
   # Returns a query String.
   def build_query(hsh)
@@ -88,48 +88,31 @@ module Jeff
       .join '&'
   end
 
-  # Internal: Signs a message.
-  #
-  # message - A String to sign.
-  #
-  # Returns a String signature.
-  def sign(message)
-    digest = OpenSSL::HMAC.digest SHA256, secret, message
-    Base64.encode64(digest).chomp
-  end
-
   private
 
-  def request(opts, &block)
+  def sign(opts)
     query = build_query opts[:query] || {}
+
     string_to_sign = [
       opts[:method],
-      host,
-      path,
+      opts[:host],
+      opts[:path],
       query
     ].join "\n"
-    signature = sign string_to_sign
-    opts[:query] = [query, "Signature=#{escape signature}"].join '&'
 
-    connection.request opts, &block
+    digest    = OpenSSL::HMAC.digest SHA256, secret, string_to_sign
+    signature = Base64.encode64(digest).chomp
+
+    opts.update query: [
+       query,
+       "Signature=#{escape signature}"
+    ].join('&')
   end
 
   def escape(val)
     val.to_s.gsub(UNRESERVED) do
       '%' + $1.unpack('H2' * $1.bytesize).join('%').upcase
     end
-  end
-
-  def host
-    @host ||= url.host
-  end
-
-  def path
-    @path ||= url.path
-  end
-
-  def url
-    @url ||= URI endpoint
   end
 
   module ClassMethods
