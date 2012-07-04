@@ -31,7 +31,7 @@ end
 Set an AWS endpoint and credentials.
 
 ```ruby
-client = Class.new.tap do |config|
+client = Client.new.tap do |config|
   config.endpoint = 'http://example.com/path'
   config.key      = 'key'
   config.secret   = 'secret'
