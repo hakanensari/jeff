@@ -71,6 +71,35 @@ client.get query:          {},
 
 HTTP connections are persistent.
 
+### Instrumentation
+
+Requests can be instrumented.
+
+```ruby
+class Logger
+  def self.instrument(name, params = {})
+    if name =~ /request/
+      $stderr.puts [
+        params[:scheme],
+        '://',
+        params[:host]
+        '/',
+        params[:path],
+        '?',
+        params[:query]
+      ].join
+      yield if block_given?
+    end
+  end
+end
+
+client.get query:        {},
+           instrumentor: Logger
+```
+
+For more detailed configuration options, check out the [README][excon] of
+excon.
+
 [aws]:   http://aws.amazon.com/
 [excon]: https://github.com/geemus/excon
 [sign]:  http://docs.amazonwebservices.com/general/latest/gr/signature-version-2.html
