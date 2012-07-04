@@ -94,7 +94,7 @@ module Jeff
     query = build_query opts[:query] || {}
 
     string_to_sign = [
-      opts[:method],
+      opts[:method].upcase,
       opts[:host] || connection.connection[:host],
       opts[:path] || connection.connection[:path],
       query
