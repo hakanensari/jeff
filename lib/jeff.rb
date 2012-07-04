@@ -95,8 +95,8 @@ module Jeff
 
     string_to_sign = [
       opts[:method],
-      opts[:host],
-      opts[:path],
+      opts[:host] || connection.connection[:host],
+      opts[:path] || connection.connection[:path],
       query
     ].join "\n"
 
