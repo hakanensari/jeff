@@ -46,6 +46,8 @@ streamer = ->(chunk, remaining, total) { puts chunk }
 client.get response_block: streamer
 ```
 
+HTTP connections are persistent.
+
 ## DSL
 
 **Jeff** comes with a minimal DSL to set default headers and parameters.
@@ -54,8 +56,8 @@ client.get response_block: streamer
 class Client
   include Jeff
 
-  params 'AssociateTag' => Proc.new { tag },
-         'Service'      => 'SomeService'
+  params 'Tag'     => Proc.new { tag },
+         'Service' => 'SomeService'
 
   attr_accessor :tag
 end
@@ -67,7 +69,8 @@ Use procs to populate dynamic values.
 client = Client.new
 client.tag = 'foo'
 
-client.default_params['Tag'] # => 'foo'
+client.default_params.fetch 'Tag'
+# => 'foo'
 ```
 
 [aws]:   http://aws.amazon.com/
