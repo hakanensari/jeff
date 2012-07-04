@@ -120,32 +120,20 @@ describe Jeff do
 
     Excon::HTTP_VERBS.each do |method|
       describe "##{method}" do
-        subject { client.send method, mock: true }
+        subject { client.send(method, mock: true).body }
+
+        before do
+          Excon.stub({ method: method.to_sym }) do |params|
+            { body: params }
+          end
+        end
 
         it "should make a #{method.upcase} request" do
-          Excon.stub({ method: method.to_sym }, { body: method })
-          subject.body.should eql method
-        end
-
-        it 'should include default headers' do
-          Excon.stub({ method: method.to_sym }) do |params|
-            { body: params[:headers] }
-          end
-          subject.body.should have_key 'User-Agent'
-        end
-
-        it 'should include parameters' do
-          Excon.stub({ method: method.to_sym }) do |params|
-            { body: params[:query] }
-          end
-          subject.body.should match client.build_query({})
+          subject[:method].should eql method.to_sym
         end
 
         it 'should append a signature' do
-          Excon.stub({ method: method.to_sym }) do |params|
-            { body: params[:query] }
-          end
-          subject.body.should match /Signature=[^&]+$/
+          subject[:query].should match /.+&Signature=[^&]+$/
         end
       end
     end
