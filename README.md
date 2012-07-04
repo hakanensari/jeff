@@ -16,17 +16,32 @@ class Client
 end
 ```
 
-By setting the minimum credentials, you should be able to access a compatible
-AWS endpoint.
+Customise default headers and parameters.
+
+```ruby
+class Client
+  headers 'User-Agent' => 'Client'
+  params  'Service'    => 'SomeService',
+          'Tag'        => Proc.new { tag }
+
+  attr_accessor :tag
+end
+```
+
+Set an AWS endpoint and credentials.
 
 ```ruby
 client = Class.new.tap do |config|
-  config.endpoint = 'http://aws-url.com/path'
+  config.endpoint = 'http://example.com/path'
   config.key      = 'key'
   config.secret   = 'secret'
 end
+```
+You should now be able to access the endpoint.
 
-client.post body: 'data'
+```ruby
+client.post query: {},
+            body:  'data'
 ```
 
 Make a chunked request.
@@ -35,7 +50,8 @@ Make a chunked request.
 file = File.open 'data'
 chunker = -> { file.read Excon::CHUNK_SIZE).to_s }
 
-client.post request_block: chunker
+client.post query:         {},
+            request_block: chunker
 ```
 
 Stream a response.
@@ -43,35 +59,11 @@ Stream a response.
 ```ruby
 streamer = ->(chunk, remaining, total) { puts chunk }
 
-client.get response_block: streamer
+client.get query:          {},
+           response_block: streamer
 ```
 
 HTTP connections are persistent.
-
-## DSL
-
-**Jeff** comes with a minimal DSL to set default headers and parameters.
-
-```ruby
-class Client
-  include Jeff
-
-  params 'Tag'     => Proc.new { tag },
-         'Service' => 'SomeService'
-
-  attr_accessor :tag
-end
-```
-
-Use procs to populate dynamic values.
-
-```ruby
-client = Client.new
-client.tag = 'foo'
-
-client.default_params.fetch 'Tag'
-# => 'foo'
-```
 
 [aws]:   http://aws.amazon.com/
 [excon]: https://github.com/geemus/excon
