@@ -37,6 +37,7 @@ client = Client.new.tap do |config|
   config.secret   = 'secret'
 end
 ```
+
 You should now be able to access the endpoint.
 
 ```ruby
@@ -44,7 +45,9 @@ client.post query: {},
             body:  'data'
 ```
 
-Make a chunked request.
+### Chunked Requests
+
+You can upload large files performantly by passing a proc that delivers chunks.
 
 ```ruby
 file = File.open 'data'
@@ -54,7 +57,10 @@ client.post query:         {},
             request_block: chunker
 ```
 
-Stream a response.
+### Streaming Responses
+
+Similarly, you can download and parse large files performantly by passing a
+block that will receive chunks.
 
 ```ruby
 streamer = ->(chunk, remaining, total) { puts chunk }
