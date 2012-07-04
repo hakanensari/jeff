@@ -69,8 +69,6 @@ client.get query:          {},
            response_block: streamer
 ```
 
-HTTP connections are persistent.
-
 ### Instrumentation
 
 Requests can be instrumented.
