@@ -80,7 +80,7 @@ class Logger
       $stderr.puts [
         params[:scheme],
         '://',
-        params[:host]
+        params[:host],
         '/',
         params[:path],
         '?',
