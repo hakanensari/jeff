@@ -97,7 +97,13 @@ client.get query:        {},
 
 For more detailed configuration options, check out the [excon README][excon].
 
-[aws]:   http://aws.amazon.com/
-[excon]: https://github.com/geemus/excon
-[sign]:  http://docs.amazonwebservices.com/general/latest/gr/signature-version-2.html
-[jeff]:  http://f.cl.ly/items/0a3R3J0k1R2f423k1q2l/jeff.jpg
+## Compatibility
+
+**Jeff** is Ruby 1.9-compatible and [tested against MRI 1.9.3 plus JRuby and
+Rubinius in 1.9 mode][travis].
+
+[aws]:    http://aws.amazon.com/
+[excon]:  https://github.com/geemus/excon
+[sign]:   http://docs.amazonwebservices.com/general/latest/gr/signature-version-2.html
+[jeff]:   http://f.cl.ly/items/0a3R3J0k1R2f423k1q2l/jeff.jpg
+[travis]: http://travis-ci.org/#!/hakanensari/jeff
