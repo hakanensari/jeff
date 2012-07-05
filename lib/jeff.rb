@@ -25,7 +25,7 @@ module Jeff
   # Returns the Hash default request parameters.
   def default_params
     self.class.params.reduce({}) do |a, (k, v)|
-      a.update k => (v.is_a?(Proc) ? instance_eval(&v) : v)
+      a.update k => (v.is_a?(Proc) ? instance_exec(&v) : v)
     end
   end
 
@@ -138,10 +138,10 @@ module Jeff
     # Returns the Hash parameters.
     def params(hsh = nil)
       @params ||= {
-        'AWSAccessKeyId'   => Proc.new { key },
+        'AWSAccessKeyId'   => -> { key },
         'SignatureVersion' => '2',
         'SignatureMethod'  => 'HmacSHA256',
-        'Timestamp'        => Proc.new { Time.now.utc.iso8601 }
+        'Timestamp'        => -> { Time.now.utc.iso8601 }
       }
       @params.update hsh if hsh
 

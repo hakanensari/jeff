@@ -22,7 +22,7 @@ Customise default headers and parameters.
 class Client
   headers 'User-Agent' => 'Client'
   params  'Service'    => 'SomeService',
-          'Tag'        => Proc.new { tag }
+          'Tag'        => -> { tag }
 
   attr_accessor :tag
 end
