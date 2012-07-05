@@ -95,11 +95,17 @@ client.get query:        {},
            instrumentor: Logger
 ```
 
-For more detailed configuration options, check out the [excon README][excon].
+### Miscellaneous
+
+HTTP connections are persistent.
+
+By default, Jeff will retry failed requests 4 times.
+
+For more detailed configuration options, check out [excon][excon].
 
 ## Compatibility
 
-**Jeff** is Ruby 1.9-compatible and [tested against MRI 1.9.3 plus JRuby and
+**Jeff** is Ruby 1.9-compatible. It is tested against [MRI 1.9.3 plus JRuby and
 Rubinius in 1.9 mode][travis].
 
 [aws]:    http://aws.amazon.com/
