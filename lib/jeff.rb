@@ -19,7 +19,8 @@ module Jeff
 
   # Returns an Excon::Connection.
   def connection
-    @connection ||= Excon.new endpoint, :headers => default_headers
+    @connection ||= Excon.new endpoint, headers:    default_headers,
+                                        idempotent: true
   end
 
   # Returns the Hash default request parameters.

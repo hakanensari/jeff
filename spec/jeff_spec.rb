@@ -137,5 +137,23 @@ describe Jeff do
         end
       end
     end
+
+    context 'given a failed request' do
+      before do
+        has_run = false
+        Excon.stub({ method: :get }) do |params|
+          if has_run
+            { status: 200 }
+          else
+            has_run = true
+            raise Excon::Errors::SocketError.new Exception.new 'Mock Error'
+          end
+        end
+      end
+
+      it 'should retry' do
+        client.get(mock: true).status.should be 200
+      end
+    end
   end
 end
