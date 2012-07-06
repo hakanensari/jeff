@@ -16,25 +16,25 @@ module Jeff
     base.extend ClassMethods
   end
 
-  # Returns an Excon::Connection.
+  # Internal: Returns an Excon::Connection.
   def connection
     @connection ||= Excon.new endpoint, headers:    default_headers,
                                         idempotent: true
   end
 
-  # Returns the Hash default request parameters.
+  # Internal: Returns the Hash default request parameters.
   def default_params
     self.class.params.reduce({}) do |a, (k, v)|
       a.update k => (v.is_a?(Proc) ? instance_exec(&v) : v)
     end
   end
 
-  # Returns the Hash default headers.
+  # Internal: Returns the Hash default headers.
   def default_headers
     self.class.headers
   end
 
-  # Gets the String AWS endpoint.
+  # Internal: Gets the String AWS endpoint.
   #
   # Raises a MissingEndpoint error if endpoint is missing.
   def endpoint
@@ -44,7 +44,7 @@ module Jeff
   # Sets the String AWS endpoint.
   attr_writer :endpoint
 
-  # Gets the String AWS access key id.
+  # Internal: Gets the String AWS access key id.
   #
   # Raises a MissingKey error if key is missing.
   def key
@@ -54,7 +54,7 @@ module Jeff
   # Sets the String AWS access key id.
   attr_writer :key
 
-  # Gets the String AWS secret key.
+  # Internal: Gets the Jeff::Secret.
   #
   # Raises a MissingSecret error if secret is missing.
   def secret
