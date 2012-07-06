@@ -96,13 +96,20 @@ module Jeff
 
   private
 
+  def connection_host
+    [connection.connection[:host], connection.connection[:port]].join ':'
+  end
+  def connection_path
+    connection.connection[:path]
+  end
+
   def sign(opts)
     query = build_query opts[:query] || {}
 
     string_to_sign = [
       opts[:method].upcase,
-      opts[:host] || connection.connection[:host],
-      opts[:path] || connection.connection[:path],
+      connection_host,
+      opts[:path] || connection_path,
       query
     ].join "\n"
     signature = secret.sign string_to_sign
