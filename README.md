@@ -76,23 +76,12 @@ Requests can be instrumented.
 ```ruby
 class Logger
   def self.instrument(name, params = {})
-    if name =~ /request/
-      $stderr.puts [
-        params[:scheme],
-        '://',
-        params[:host],
-        '/',
-        params[:path],
-        '?',
-        params[:query]
-      ].join
-      yield if block_given?
-    end
+   $stderr.puts name, params
+   yield if block_given?
   end
 end
 
-client.get query:        {},
-           instrumentor: Logger
+client.get query: {}, instrumentor: Logger
 ```
 
 ### Miscellaneous
