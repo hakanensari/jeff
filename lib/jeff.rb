@@ -99,6 +99,7 @@ module Jeff
   def connection_host
     [connection.connection[:host], connection.connection[:port]].join ':'
   end
+
   def connection_path
     connection.connection[:path]
   end
