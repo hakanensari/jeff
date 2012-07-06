@@ -1,8 +1,8 @@
-require 'base64'
 require 'time'
 
 require 'excon'
 
+require 'jeff/secret'
 require 'jeff/version'
 
 module Jeff
@@ -10,7 +10,6 @@ module Jeff
   MissingKey      = Class.new ArgumentError
   MissingSecret   = Class.new ArgumentError
 
-  SHA256 = OpenSSL::Digest::SHA256.new
   UNRESERVED = /([^\w.~-]+)/
 
   def self.included(base)
@@ -62,8 +61,14 @@ module Jeff
     @secret or raise MissingSecret
   end
 
-  # Sets the String AWS secret key.
-  attr_writer :secret
+  # Sets the AWS secret key.
+  #
+  # key - A String secret.
+  #
+  # Returns a Jeff::Secret.
+  def secret=(key)
+    @secret = Secret.new key
+  end
 
   # Generate HTTP request verb methods that sign queries and then delegate
   # request to Excon.
@@ -100,9 +105,7 @@ module Jeff
       opts[:path] || connection.connection[:path],
       query
     ].join "\n"
-
-    digest    = OpenSSL::HMAC.digest SHA256, secret, string_to_sign
-    signature = Base64.encode64(digest).chomp
+    signature = secret.sign string_to_sign
 
     opts.update query: [
        query,
