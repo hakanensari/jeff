@@ -16,6 +16,19 @@ module Jeff
     base.extend ClassMethods
   end
 
+  # Internal: Builds a sorted query.
+  #
+  # hsh - A hash of query parameters specific to the request.
+  #
+  # Returns a query String.
+  def build_query(hsh)
+    default_params
+      .merge(hsh)
+      .map { |k, v| "#{k}=#{ escape v }" }
+      .sort
+      .join '&'
+  end
+
   # Internal: Returns an Excon::Connection.
   def connection
     @connection ||= Excon.new endpoint, headers:    default_headers,
@@ -79,19 +92,6 @@ module Jeff
         connection.request sign opts, &block
       end
     DEF
-  end
-
-  # Internal: Builds a sorted query.
-  #
-  # hsh - A hash of query parameters specific to the request.
-  #
-  # Returns a query String.
-  def build_query(hsh)
-    default_params
-      .merge(hsh)
-      .map { |k, v| "#{k}=#{ escape v }" }
-      .sort
-      .join '&'
   end
 
   private
