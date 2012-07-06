@@ -128,6 +128,8 @@ describe Jeff do
           end
         end
 
+        after { Excon.stubs.clear }
+
         it "should make a #{method.upcase} request" do
           subject[:method].should eql method.to_sym
         end
@@ -150,6 +152,8 @@ describe Jeff do
           end
         end
       end
+
+      after { Excon.stubs.clear }
 
       it 'should retry' do
         client.get(mock: true).status.should be 200
