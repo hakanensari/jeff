@@ -18,7 +18,6 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency             'excon', '~> 0.14.2'
   gem.add_development_dependency 'guard-rspec'
-  gem.add_development_dependency 'pry'
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec'
 end
