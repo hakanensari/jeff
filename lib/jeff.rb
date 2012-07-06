@@ -96,14 +96,6 @@ module Jeff
 
   private
 
-  def connection_host
-    [connection.connection[:host], connection.connection[:port]].join ':'
-  end
-
-  def connection_path
-    connection.connection[:path]
-  end
-
   def sign(opts)
     query = build_query opts[:query] || {}
 
@@ -119,6 +111,14 @@ module Jeff
        query,
        "Signature=#{escape signature}"
     ].join('&')
+  end
+
+  def connection_host
+    [connection.connection[:host], connection.connection[:port]].join ':'
+  end
+
+  def connection_path
+    connection.connection[:path]
   end
 
   def escape(val)
