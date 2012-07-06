@@ -86,11 +86,10 @@ client.get query: {}, instrumentor: Logger
 
 ### Miscellaneous
 
-HTTP connections are persistent.
+* HTTP connections are persistent.
+* By default, Jeff will retry failed requests 4 times.
 
-By default, Jeff will retry failed requests 4 times.
-
-For more detailed configuration options, check out [excon][excon].
+For more detailed configuration options, read [excon][excon].
 
 ## Compatibility
 
