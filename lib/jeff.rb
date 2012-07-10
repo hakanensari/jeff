@@ -87,9 +87,9 @@ module Jeff
   # request to Excon.
   Excon::HTTP_VERBS. each do |method|
     eval <<-DEF
-      def #{method}(opts = {}, &block)
+      def #{method}(opts = {})
         opts.update method: :#{method}
-        connection.request sign opts, &block
+        connection.request sign opts
       end
     DEF
   end
