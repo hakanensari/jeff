@@ -1,14 +1,15 @@
 # Jeff
 
-**Jeff** is a light-weight module that mixes in client behaviour for [Amazon
-Web Services (AWS)][aws]. It wraps the HTTP adapter [Excon][excon] and
-implements [Signature Version 2][sign].
+**Jeff** is a light-weight module that mixes in client behaviour for
+[Amazon Web Services (AWS)][aws]. It wraps [Excon][excon], provides a
+[Nokogiri][nokogiri]-based SAX push parser, and implements [Signature
+Version 2][sign].
 
 ![jeff][jeff]
 
 ## Usage
 
-Here's a hypothetical client.
+Build a a hypothetical client.
 
 ```ruby
 class Client
@@ -47,7 +48,8 @@ client.post query: {},
 
 ### Chunked Requests
 
-You can upload large files performantly by passing a proc that delivers chunks.
+You can upload large files performantly by passing a proc that delivers
+chunks.
 
 ```ruby
 file = File.open 'data'
@@ -59,14 +61,18 @@ client.post query:         {},
 
 ### Streaming Responses
 
-Similarly, you can download and parse large files performantly by passing a
-block that will receive chunks.
+Similarly, you can download and parse large files performantly by
+passing a block that will receive chunks.
+
+Jeff provides a SAX push parser for this purpose.
 
 ```ruby
-streamer = ->(chunk, remaining, total) { puts chunk }
+streamer = Jeff::Streamer.new
 
 client.get query:          {},
            response_block: streamer
+
+streamer.finish
 ```
 
 ### Instrumentation
@@ -93,11 +99,11 @@ For more detailed configuration options, read [excon][excon].
 
 ## Compatibility
 
-**Jeff** is Ruby 1.9-compatible. It is tested against [MRI 1.9.3 plus JRuby and
-Rubinius in 1.9 mode][travis].
+**Jeff** is [Ruby 1.9-compatible][travis].
 
-[aws]:    http://aws.amazon.com/
-[excon]:  https://github.com/geemus/excon
-[sign]:   http://docs.amazonwebservices.com/general/latest/gr/signature-version-2.html
-[jeff]:   http://f.cl.ly/items/0a3R3J0k1R2f423k1q2l/jeff.jpg
-[travis]: http://travis-ci.org/#!/hakanensari/jeff
+[aws]:      http://aws.amazon.com/
+[excon]:    https://github.com/geemus/excon
+[jeff]:     http://f.cl.ly/items/0a3R3J0k1R2f423k1q2l/jeff.jpg
+[nokogiri]: http://nokogiri.org/
+[sign]:     http://docs.amazonwebservices.com/general/latest/gr/signature-version-2.html
+[travis]:   http://travis-ci.org/#!/hakanensari/jeff
