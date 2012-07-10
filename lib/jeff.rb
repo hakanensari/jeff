@@ -3,6 +3,7 @@ require 'time'
 require 'excon'
 
 require 'jeff/secret'
+require 'jeff/streamer'
 require 'jeff/version'
 
 module Jeff
