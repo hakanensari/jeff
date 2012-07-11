@@ -8,14 +8,7 @@ module Jeff
       %{
         <?xml version="1.0" ?>
         <foo>
-          <bar>
-            <baz>1</baz>
-            <qux>2</qux>
-            <qux>3</qux>
-          </bar>
-          <quux>
-            <qux>4</qux>
-          </quux>
+          <bar>1</bar>
         </foo>
       }.strip.gsub />\s+</, '><'
     end
@@ -30,24 +23,6 @@ module Jeff
       end
 
       streamer.root.should have_key 'foo'
-    end
-
-    describe '#find' do
-      before do
-        streamer.call xml, 0, xml.size
-      end
-
-      it 'should find a node' do
-        streamer.find('baz').should eql ['1']
-      end
-
-      it 'should find a collection of nodes' do
-        streamer.find('qux').should eql ['2', '3', '4']
-      end
-
-      it 'should be empty if no matches found' do
-        streamer.find('corge').should be_empty
-      end
     end
   end
 end
