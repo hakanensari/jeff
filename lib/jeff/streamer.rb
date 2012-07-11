@@ -7,7 +7,6 @@ module Jeff
     extend Forwardable
 
     def_delegators :@parser, :<<, :finish
-    def_delegators :@doc, :root
 
     def initialize
       @parser = Nokogiri::XML::SAX::PushParser.new @doc = Document.new
@@ -17,22 +16,31 @@ module Jeff
     #
     # key - A String key.
     #
-    # Returns a String or Hash match, an Array of matches, or nil if no matches
-    # are found.
+    # Returns an Array of matches.
     def find(key, node = nil)
       node ||= root
 
       case node
       when Array
-        ret = node.map { |val| find key, val }.compact
-        ret.empty? ? nil :ret
+        node
+          .map { |val| find key, val }
+          .compact
+          .flatten
       when Hash
         if node.has_key? key
-          node.fetch key
+          [node[key]]
         else
-          node.values.map { |val| find key, val }.compact.first
+          node
+            .values
+            .map { |val| find key, val }
+            .compact
+            .flatten
         end
       end
+    end
+
+    def root
+      @parser.document.root
     end
   end
 end
