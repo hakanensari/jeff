@@ -1,15 +1,14 @@
-require 'forwardable'
-
 require 'jeff/document'
 
 module Jeff
   class Streamer
-    extend Forwardable
-
-    def_delegators :@parser, :<<, :finish
-
     def initialize
-      @parser = Nokogiri::XML::SAX::PushParser.new @doc = Document.new
+      @parser = Nokogiri::XML::SAX::PushParser.new Document.new
+    end
+
+    def call(chunk, remaining_bytes, total_bytes)
+      @parser << chunk.sub(/\n/, '')
+      @parser.finish if remaining_bytes == 0
     end
 
     # Queries response for a key.
