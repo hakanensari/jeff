@@ -89,8 +89,13 @@ module Jeff
   Excon::HTTP_VERBS. each do |method|
     eval <<-DEF
       def #{method}(opts = {})
-        opts.update method: :#{method}
-        connection.request sign opts
+        streamer = Streamer.new
+        opts.update method:         :#{method},
+                    response_block: streamer
+        res = connection.request sign opts
+        res.body = streamer
+
+        res
       end
     DEF
   end

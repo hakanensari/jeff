@@ -28,10 +28,7 @@ class Client
       'ItemId'    => Array(asins).join(',')
     }
 
-    streamer = Streamer.new
-    res = get query: params, response_block: streamer
-    res.body = streamer
-    res
+    get query: params
   end
 
   private

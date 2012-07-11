@@ -120,22 +120,18 @@ describe Jeff do
 
     Excon::HTTP_VERBS.each do |method|
       describe "##{method}" do
-        subject { client.send(method, mock: true).body }
+        subject { client.send(method, mock: true).body.root['request'] }
 
         before do
           Excon.stub({ method: method.to_sym }) do |params|
-            { body: params }
+            { body: "<request>#{params[:method]}</request>" }
           end
         end
 
         after { Excon.stubs.clear }
 
         it "should make a #{method.upcase} request" do
-          subject[:method].should eql method.to_sym
-        end
-
-        it 'should append a signature' do
-          subject[:query].should match /.+&Signature=[^&]+$/
+          should eql method
         end
       end
     end
