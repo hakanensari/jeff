@@ -62,11 +62,9 @@ client.post query:         {},
             request_block: chunker
 ```
 
-For more configuration options, read [excon][excon].
-
 ## Compatibility
 
-**Jeff** is [Ruby 1.9-compatible][travis].
+**Jeff** is compatible with [all Ruby 1.9 flavours][travis].
 
 [aws]:      http://aws.amazon.com/
 [excon]:    https://github.com/geemus/excon
