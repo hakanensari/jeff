@@ -1,9 +1,9 @@
 # Jeff
 
 **Jeff** is a light-weight module that mixes in client behaviour for
-[Amazon Web Services (AWS)][aws]. It wraps [Excon][excon], provides a
-[Nokogiri][nokogiri]-based SAX push parser, and implements [Signature
-Version 2][sign].
+[Amazon Web Services (AWS)][aws]. It wraps [Excon][excon], parses
+responses with [Nokogiri][nokogiri], and implements [Signature Version
+2][sign].
 
 ![jeff][jeff]
 
@@ -42,8 +42,11 @@ end
 You should now be able to access the endpoint.
 
 ```ruby
-client.post query: {},
-            body:  'data'
+res = client.post query: {},
+                  body:  'data'
+
+puts res.status    # => 200
+puts res.body.root # => { 'Foo' => 'Bar' }
 ```
 
 ### Chunked Requests
@@ -59,43 +62,7 @@ client.post query:         {},
             request_block: chunker
 ```
 
-### Streaming Responses
-
-Similarly, you can download and parse large files performantly by
-passing a block that will receive chunks.
-
-Jeff provides a SAX push parser for this purpose.
-
-```ruby
-streamer = Jeff::Streamer.new
-
-client.get query:          {},
-           response_block: streamer
-
-streamer.finish
-```
-
-### Instrumentation
-
-Requests can be instrumented.
-
-```ruby
-class Logger
-  def self.instrument(name, params = {})
-   $stderr.puts name, params
-   yield if block_given?
-  end
-end
-
-client.get query: {}, instrumentor: Logger
-```
-
-### Miscellaneous
-
-* HTTP connections are persistent.
-* By default, Jeff will retry failed requests 4 times.
-
-For more detailed configuration options, read [excon][excon].
+For more configuration options, read [excon][excon].
 
 ## Compatibility
 
