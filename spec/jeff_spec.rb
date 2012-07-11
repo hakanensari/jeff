@@ -74,18 +74,14 @@ describe Jeff do
     end
 
     describe '#build_query' do
-      subject { client.build_query 'Foo' => 1, 'AA' => 1 }
+      subject { client.build_query 'A10' => 1, 'A1' => 1 }
 
       it 'should include default parameters' do
         should match /Timestamp/
       end
 
-      it 'should include request-specific parameters' do
-        should match /Foo/
-      end
-
-      it 'should sort parameters' do
-        should match /^AA/
+      it 'should sort lexicographically' do
+        should match /^A1=1&A10=/
       end
     end
   end

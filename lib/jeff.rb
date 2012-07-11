@@ -25,8 +25,8 @@ module Jeff
   def build_query(hsh)
     default_params
       .merge(hsh)
-      .map { |k, v| "#{k}=#{ escape v }" }
       .sort
+      .map { |k, v| "#{k}=#{ escape v }" }
       .join '&'
   end
 
