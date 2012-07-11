@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 module Jeff
-  describe Body do
+  describe Document do
     let(:io) do
       StringIO.new %{
         <?xml version=\"1.0\" ?>
@@ -14,8 +14,8 @@ module Jeff
       }.strip.gsub />\s+</, '><'
     end
 
-    let(:body) { described_class.new }
-    let(:parser) { Nokogiri::XML::SAX::Parser.new body }
+    let(:doc) { described_class.new }
+    let(:parser) { Nokogiri::XML::SAX::Parser.new doc }
 
     before do
       io.rewind
@@ -23,7 +23,7 @@ module Jeff
     end
 
     describe '#root' do
-      subject { body.root['ItemAttributes'] }
+      subject { doc.root['ItemAttributes'] }
 
       it { should be_a Hash }
 

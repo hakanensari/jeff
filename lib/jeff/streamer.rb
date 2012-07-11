@@ -1,25 +1,38 @@
 require 'forwardable'
 
-require 'jeff/body'
+require 'jeff/document'
 
 module Jeff
   class Streamer
     extend Forwardable
 
-    def_delegator :@parser, :<<
+    def_delegators :@parser, :<<, :finish
+    def_delegators :@doc, :root
 
-    # Creates a new Streamer.
     def initialize
-      @body   = Body.new
-      @parser = Nokogiri::XML::SAX::PushParser.new @body
+      @parser = Nokogiri::XML::SAX::PushParser.new @doc = Document.new
     end
 
-    # Finishes parsing.
+    # Queries response for a key.
     #
-    # Returns the Hash body.
-    def finish
-      @parser.finish
-      @body.root
+    # key - A String key.
+    #
+    # Returns a String or Hash match, an Array of matches, or nil if no matches
+    # are found.
+    def find(key, node = nil)
+      node ||= root
+
+      case node
+      when Array
+        ret = node.map { |val| find key, val }.compact
+        ret.empty? ? nil :ret
+      when Hash
+        if node.has_key? key
+          node.fetch key
+        else
+          node.values.map { |val| find key, val }.compact.first
+        end
+      end
     end
   end
 end

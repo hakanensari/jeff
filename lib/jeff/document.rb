@@ -1,8 +1,8 @@
 require 'nokogiri'
 
 module Jeff
-  # Internal: The response body.
-  class Body < Nokogiri::XML::SAX::Document
+  # Internal: A SAX document that wraps the AWS XML response.
+  class Document < Nokogiri::XML::SAX::Document
     def characters(val)
       (node['__content__'] ||= '') << val
     end
