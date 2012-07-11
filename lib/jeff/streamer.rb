@@ -36,10 +36,12 @@ module Jeff
             .flatten
         end
       end
+    def document
+      @parser.document
     end
 
     def root
-      @parser.document.root
+      document.root
     end
   end
 end
