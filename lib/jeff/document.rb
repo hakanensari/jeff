@@ -3,7 +3,10 @@ require 'nokogiri'
 module Jeff
   class Document < Nokogiri::XML::SAX::Document
     def characters(val)
-      (node['__content__'] ||= '') << val
+      val.strip!
+      unless val.empty?
+        (node['__content__'] ||= '') << val
+      end
     end
 
     def end_element(key)

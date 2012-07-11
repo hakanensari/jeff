@@ -11,7 +11,7 @@ module Jeff
           <Author>Felix Guattari</Author>
           <Creator Role="Translator">Robert Hurley</Creator>
         </ItemAttributes>
-      }.strip.gsub />\s+</, '><'
+      }.strip
     end
 
     let(:doc) { described_class.new }
@@ -39,6 +39,10 @@ module Jeff
         creator = subject['Creator']
         creator['Role'].should eql 'Translator'
         creator['__content__'].should eql 'Robert Hurley'
+      end
+
+      it 'should ignore space between tags' do
+        should_not have_key '__content__'
       end
     end
   end
