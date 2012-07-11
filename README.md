@@ -1,9 +1,8 @@
 # Jeff
 
 **Jeff** is a light-weight module that mixes in client behaviour for
-[Amazon Web Services (AWS)][aws]. It wraps [Excon][excon], parses
-responses with [Nokogiri][nokogiri], and implements [Signature Version
-2][sign].
+[Amazon Web Services (AWS)][aws]. It wraps [Excon][excon], parses with
+[Nokogiri][nokogiri], and implements [Signature Version 2][sign].
 
 ![jeff][jeff]
 
