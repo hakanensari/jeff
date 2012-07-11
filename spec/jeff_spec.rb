@@ -155,5 +155,19 @@ describe Jeff do
         client.get(mock: true).status.should be 200
       end
     end
+
+    context 'given a malformed XML' do
+      before do
+        Excon.stub({ method: :get }) do |params|
+          { body: "\n<?xml version=\"1.0\" ?><foo/>" }
+        end
+      end
+
+      after { Excon.stubs.clear }
+
+      it 'should not raise an error' do
+        client.get mock: true
+      end
+    end
   end
 end

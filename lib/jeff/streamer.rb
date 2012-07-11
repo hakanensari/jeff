@@ -7,7 +7,7 @@ module Jeff
     end
 
     def call(chunk, remaining_bytes, total_bytes)
-      @parser << chunk.sub(/\n/, '')
+      @parser << chunk.sub(/^\n/, '')
       @parser.finish if remaining_bytes == 0
     end
 
