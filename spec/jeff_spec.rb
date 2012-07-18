@@ -61,8 +61,8 @@ describe Jeff do
       client.key = 'key'
     end
 
-    describe '#default_params' do
-      subject { client.default_params }
+    describe '#params' do
+      subject { client.params }
 
       it 'should include the key' do
         subject['AWSAccessKeyId'].should eql client.key

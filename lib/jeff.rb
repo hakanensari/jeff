@@ -2,11 +2,16 @@ require 'time'
 
 require 'excon'
 
+require 'jeff/response'
 require 'jeff/secret'
 require 'jeff/streamer'
 require 'jeff/version'
 
+# Jeff is a light-weight module that mixes in client behaviour for Amazon Web
+# Services (AWS).
 module Jeff
+  USER_AGENT = "Jeff/#{VERSION} (Language=Ruby; #{`hostname`.chomp})"
+
   MissingEndpoint = Class.new ArgumentError
   MissingKey      = Class.new ArgumentError
   MissingSecret   = Class.new ArgumentError
@@ -15,6 +20,13 @@ module Jeff
 
   def self.included(base)
     base.extend ClassMethods
+
+    base.headers 'User-Agent'       => USER_AGENT
+
+    base.params  'AWSAccessKeyId'   => -> { key },
+                 'SignatureVersion' => '2',
+                 'SignatureMethod'  => 'HmacSHA256',
+                 'Timestamp'        => -> { Time.now.utc.iso8601 }
   end
 
   # Internal: Builds a sorted query.
@@ -23,7 +35,7 @@ module Jeff
   #
   # Returns a query String.
   def build_query(hsh)
-    default_params
+    params
       .merge(hsh)
       .sort
       .map { |k, v| "#{k}=#{ escape v }" }
@@ -32,20 +44,8 @@ module Jeff
 
   # Internal: Returns an Excon::Connection.
   def connection
-    @connection ||= Excon.new endpoint, headers:    default_headers,
+    @connection ||= Excon.new endpoint, headers:    headers,
                                         idempotent: true
-  end
-
-  # Internal: Returns the Hash default request parameters.
-  def default_params
-    self.class.params.reduce({}) do |a, (k, v)|
-      a.update k => (v.is_a?(Proc) ? instance_exec(&v) : v)
-    end
-  end
-
-  # Internal: Returns the Hash default headers.
-  def default_headers
-    self.class.headers
   end
 
   # Internal: Gets the String AWS endpoint.
@@ -58,6 +58,11 @@ module Jeff
   # Sets the String AWS endpoint.
   attr_writer :endpoint
 
+  # Internal: Returns the Hash default headers.
+  def headers
+    self.class.headers
+  end
+
   # Internal: Gets the String AWS access key id.
   #
   # Raises a MissingKey error if key is missing.
@@ -67,6 +72,13 @@ module Jeff
 
   # Sets the String AWS access key id.
   attr_writer :key
+
+  # Internal: Returns the Hash default request parameters.
+  def params
+    self.class.params.reduce({}) do |a, (k, v)|
+      a.update k => (v.is_a?(Proc) ? instance_exec(&v) : v)
+    end
+  end
 
   # Internal: Gets the Jeff::Secret.
   #
@@ -134,16 +146,13 @@ module Jeff
   end
 
   module ClassMethods
-    # Amazon recommends that libraries identify themselves via a User Agent.
-    USER_AGENT = "Jeff/#{VERSION} (Language=Ruby; #{`hostname`.chomp})"
-
     # Gets/Updates the default headers.
     #
     # hsh - A Hash of headers.
     #
     # Returns the Hash headers.
     def headers(hsh = nil)
-      @headers ||= { 'User-Agent' => USER_AGENT }
+      @headers ||= {}
       @headers.update hsh if hsh
 
       @headers
@@ -155,12 +164,7 @@ module Jeff
     #
     # Returns the Hash parameters.
     def params(hsh = nil)
-      @params ||= {
-        'AWSAccessKeyId'   => -> { key },
-        'SignatureVersion' => '2',
-        'SignatureMethod'  => 'HmacSHA256',
-        'Timestamp'        => -> { Time.now.utc.iso8601 }
-      }
+      @params ||= {}
       @params.update hsh if hsh
 
       @params
