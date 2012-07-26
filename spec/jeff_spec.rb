@@ -116,11 +116,14 @@ describe Jeff do
 
     Excon::HTTP_VERBS.each do |method|
       describe "##{method}" do
-        subject { client.send(method, mock: true).body.root['request'] }
+        subject do
+          io = client.send(method, mock: true)
+          io.read
+        end
 
         before do
           Excon.stub({ method: method.to_sym }) do |params|
-            { body: "<request>#{params[:method]}</request>" }
+            { body: method, status: 200 }
           end
         end
 
@@ -132,12 +135,12 @@ describe Jeff do
       end
     end
 
-    context 'given a failed request' do
+    context 'given a temporary failure' do
       before do
         has_run = false
         Excon.stub({ method: :get }) do |params|
           if has_run
-            { status: 200 }
+            { body: 'ok', status: 200 }
           else
             has_run = true
             raise Excon::Errors::SocketError.new Exception.new 'Mock Error'
@@ -148,7 +151,7 @@ describe Jeff do
       after { Excon.stubs.clear }
 
       it 'should retry' do
-        client.get(mock: true).status.should be 200
+        client.get(mock: true).read.should eq 'ok'
       end
     end
 

@@ -2,9 +2,7 @@ require 'time'
 
 require 'excon'
 
-require 'jeff/response'
 require 'jeff/secret'
-require 'jeff/streamer'
 require 'jeff/version'
 
 # Jeff is a light-weight module that mixes in client behaviour for Amazon Web
@@ -96,18 +94,23 @@ module Jeff
     @secret = Secret.new key
   end
 
-  # Generate HTTP request verb methods that sign queries and then delegate
-  # request to Excon.
-  Excon::HTTP_VERBS. each do |method|
+  # Generate HTTP request verb methods that sign queries and return response
+  # bodies as IO objects.
+  Excon::HTTP_VERBS.each do |method|
     eval <<-DEF
       def #{method}(opts = {})
-        streamer = Streamer.new
-        opts.update method:         :#{method},
-                    response_block: streamer
-        res = connection.request sign opts
-        res.body = streamer
+        rd, wr = IO.pipe
+        Thread.new {
+          opts.update method:         :#{method},
+                      expects:        200,
+                      response_block: ->(chunk, remaining, total) {
+                        wr << chunk
+                        wr.close if remaining == 0
+                      }
+          connection.request sign opts
+        }
 
-        res
+        rd
       end
     DEF
   end
