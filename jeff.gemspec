@@ -7,7 +7,7 @@ Gem::Specification.new do |gem|
   gem.email         = ['hakan.ensari@papercavalier.com']
   gem.description   = %q{Minimum-viable Amazon Web Services (AWS) client}
   gem.summary       = %q{AWS client}
-  gem.homepage      = 'https://github.com/hakanensari/jeff'
+  gem.homepage      = 'https://github.com/papercavalier/jeff'
 
   gem.files         = `git ls-files`.split($\)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
@@ -16,7 +16,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
   gem.version       = Jeff::VERSION
 
-  gem.add_dependency             'excon',    '~> 0.15.0'
+  gem.add_dependency             'excon', '~> 0.15.0'
   gem.add_development_dependency 'guard-rspec'
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec'
