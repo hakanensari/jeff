@@ -117,8 +117,7 @@ describe Jeff do
     Excon::HTTP_VERBS.each do |method|
       describe "##{method}" do
         subject do
-          io = client.send(method, mock: true)
-          io.read
+          client.send(method, mock: true).body
         end
 
         before do
@@ -151,21 +150,7 @@ describe Jeff do
       after { Excon.stubs.clear }
 
       it 'should retry' do
-        client.get(mock: true).read.should eq 'ok'
-      end
-    end
-
-    context 'given a malformed XML' do
-      before do
-        Excon.stub({ method: :get }) do |params|
-          { body: "\n<?xml version=\"1.0\" ?><foo/>" }
-        end
-      end
-
-      after { Excon.stubs.clear }
-
-      it 'should not raise an error' do
-        client.get mock: true
+        client.get(mock: true).body.should eq 'ok'
       end
     end
   end

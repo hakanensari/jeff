@@ -1,6 +1,5 @@
-require 'time'
-
 require 'excon'
+require 'time'
 
 require 'jeff/secret'
 require 'jeff/version'
@@ -99,18 +98,8 @@ module Jeff
   Excon::HTTP_VERBS.each do |method|
     eval <<-DEF
       def #{method}(opts = {})
-        rd, wr = IO.pipe
-        Thread.new {
-          opts.update method:         :#{method},
-                      expects:        200,
-                      response_block: ->(chunk, remaining, total) {
-                        wr << chunk
-                        wr.close if remaining == 0
-                      }
-          connection.request sign opts
-        }
-
-        rd
+        opts.update method: :#{method}
+        connection.request sign opts
       end
     DEF
   end
