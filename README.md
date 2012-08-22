@@ -1,6 +1,6 @@
 # Jeff
 
-**Jeff** mixes in [authentication][sign] for [Amazon Web Services (AWS)][aws].
+**Jeff** mixes in [authentication][sign] for some [Amazon Web Services (AWS)][aws].
 
 ![jeff][jeff]
 
