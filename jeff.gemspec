@@ -17,7 +17,6 @@ Gem::Specification.new do |gem|
   gem.version       = Jeff::VERSION
 
   gem.add_dependency             'excon', '~> 0.16.0'
-  gem.add_development_dependency 'guard-rspec'
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec'
 
