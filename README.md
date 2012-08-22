@@ -1,6 +1,6 @@
 # Jeff
 
-**Jeff** mixes in client behaviour for [Amazon Web Services (AWS)][aws].
+**Jeff** mixes in [authentication][sign] for [Amazon Web Services (AWS)][aws].
 
 ![jeff][jeff]
 
@@ -31,8 +31,6 @@ client.get query: { 'Foo' => 'Bar' }
 
 Oh là là.
 
-[aws]:    http://aws.amazon.com/
-[excon]:  https://github.com/geemus/excon
-[jeff]:   http://f.cl.ly/items/0a3R3J0k1R2f423k1q2l/jeff.jpg
-[sign]:   http://docs.amazonwebservices.com/general/latest/gr/signature-version-2.html
-[travis]: http://travis-ci.org/#!/papercavalier/jeff
+[aws]:  http://aws.amazon.com/
+[jeff]: http://f.cl.ly/items/0a3R3J0k1R2f423k1q2l/jeff.jpg
+[sign]: http://docs.amazonwebservices.com/general/latest/gr/signature-version-2.html
