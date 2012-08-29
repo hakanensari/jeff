@@ -123,7 +123,10 @@ module Jeff
   end
 
   def connection_host
-    [connection.connection[:host], connection.connection[:port]].join ':'
+    [
+      connection.connection[:host],
+      connection.connection[:port]
+    ].join ':'
   end
 
   def connection_path
