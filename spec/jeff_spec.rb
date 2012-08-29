@@ -133,5 +133,21 @@ describe Jeff do
         end
       end
     end
+
+    context 'given an HTTP status error' do
+      before do
+        Excon.stub({ method: :get }) do
+          { status: 503 }
+        end
+      end
+
+      after { Excon.stubs.clear }
+
+      it "should raise an error" do
+        expect {
+          client.get mock: true
+        }.to raise_error Excon::Errors::HTTPStatusError
+      end
+    end
   end
 end
