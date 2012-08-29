@@ -133,25 +133,5 @@ describe Jeff do
         end
       end
     end
-
-    context 'given a temporary failure' do
-      before do
-        has_run = false
-        Excon.stub({ method: :get }) do |params|
-          if has_run
-            { body: 'ok', status: 200 }
-          else
-            has_run = true
-            raise Excon::Errors::SocketError.new Exception.new 'Mock Error'
-          end
-        end
-      end
-
-      after { Excon.stubs.clear }
-
-      it 'should retry' do
-        client.get(mock: true).body.should eq 'ok'
-      end
-    end
   end
 end
