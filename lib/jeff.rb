@@ -72,7 +72,7 @@ module Jeff
   # Internal: Returns the Hash default request parameters.
   def params
     self.class.params.reduce({}) do |a, (k, v)|
-      a.update k => (v.is_a?(Proc) ? instance_exec(&v) : v)
+      a.update k => (v.respond_to?(:call) ? instance_exec(&v) : v)
     end
   end
 
