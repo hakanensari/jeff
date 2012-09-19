@@ -117,12 +117,10 @@ module Jeff
 
       Excon::HTTP_VERBS.each do |method|
         describe "##{method}" do
-          subject do
-            client.send(method, mock: true).body
-          end
+          subject { client.send(method, mock: true).body }
 
           before do
-            Excon.stub({ method: method.to_sym }) do |params|
+            Excon.stub({ method: method.to_sym }) do
               { body: method, status: 200 }
             end
           end
@@ -132,6 +130,22 @@ module Jeff
           it "should make a #{method.upcase} request" do
             should eql method
           end
+        end
+      end
+
+      context 'given a request body' do
+        subject { client.get(mock: true, body: 'foo').body }
+
+        before do
+          Excon.stub({ method: :get }) do |params|
+            { status: 200, body: params[:headers]['Content-MD5'] }
+          end
+        end
+
+        after { Excon.stubs.clear }
+
+        it "should add an Content-MD5 header" do
+          should_not be_empty
         end
       end
 

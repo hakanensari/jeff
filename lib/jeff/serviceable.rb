@@ -1,3 +1,5 @@
+require 'base64'
+require 'digest/md5'
 require 'excon'
 require 'time'
 
@@ -96,12 +98,16 @@ module Jeff
       @secret = Secret.new key
     end
 
-    # Generate HTTP request verb methods that sign queries and return response
-    # bodies as IO objects.
+    # Generate HTTP request verb methods.
     Excon::HTTP_VERBS.each do |method|
       eval <<-DEF
         def #{method}(opts = {})
           opts.update method: :#{method}
+          if opts[:body]
+            opts[:headers] ||= {}
+            opts[:headers].update 'Content-MD5' => calculate_md5(opts[:body])
+          end
+
           connection.request sign opts
         end
       DEF
@@ -109,21 +115,8 @@ module Jeff
 
     private
 
-    def sign(opts)
-      query = build_query opts[:query] || {}
-
-      string_to_sign = [
-        opts[:method].upcase,
-        connection_host,
-        opts[:path] || connection_path,
-        query
-      ].join "\n"
-      signature = secret.sign string_to_sign
-
-      opts.update query: [
-         query,
-         "Signature=#{escape signature}"
-      ].join('&')
+    def calculate_md5(body)
+      Base64.encode64(Digest::MD5.digest(body)).strip
     end
 
     def connection_host
@@ -141,6 +134,23 @@ module Jeff
       val.to_s.gsub(UNRESERVED) do
         '%' + $1.unpack('H2' * $1.bytesize).join('%').upcase
       end
+    end
+
+    def sign(opts)
+      query = build_query opts[:query] || {}
+
+      string_to_sign = [
+        opts[:method].upcase,
+        connection_host,
+        opts[:path] || connection_path,
+        query
+      ].join "\n"
+      signature = secret.sign string_to_sign
+
+      opts.update query: [
+         query,
+         "Signature=#{escape signature}"
+      ].join('&')
     end
 
     module ClassMethods
