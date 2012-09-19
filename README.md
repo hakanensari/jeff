@@ -2,34 +2,17 @@
 
 [![travis][stat]][trav]
 
-**Jeff** adds [authentication][sign] behaviour for some [Amazon Web Services (AWS)][aws].
+**Jeff** mixes in [authentication][sign] and other client behaviour for some
+[Amazon Web Services (AWS)][aws].
 
 ![jeff][jeff]
 
 ## Usage
 
-Mix in.
-
 ```ruby
-class Client
+class Service
   include Jeff
 end
-```
-
-Set endpoint and credentials.
-
-```ruby
-client = Client.new
-
-client.endpoint = 'http://example.com/path'
-client.key      = 'key'
-client.secret   = 'secret'
-```
-
-Request.
-
-```ruby
-client.get query: { 'Foo' => 'Bar' }
 ```
 
 [stat]: https://secure.travis-ci.org/papercavalier/jeff.png
