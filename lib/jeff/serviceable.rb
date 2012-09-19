@@ -47,7 +47,9 @@ module Jeff
 
     # Internal: Returns an Excon::Connection.
     def connection
-      @connection ||= Excon.new endpoint, headers: headers, expects: 200
+      @connection ||= Excon.new endpoint,
+                                headers: headers,
+                                expects: 200
     end
 
     # Internal: Gets the String AWS endpoint.
