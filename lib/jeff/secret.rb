@@ -1,4 +1,5 @@
 require 'base64'
+require 'openssl'
 
 module Jeff
   class Secret
