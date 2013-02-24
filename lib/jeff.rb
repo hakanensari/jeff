@@ -8,9 +8,9 @@ require 'jeff/version'
 
 # Mixes in Amazon Web Services (AWS) client behaviour.
 module Jeff
-  MissingEndpoint = Class.new ArgumentError
-  MissingKey      = Class.new ArgumentError
-  MissingSecret   = Class.new ArgumentError
+  MissingEndpoint = Class.new(ArgumentError)
+  MissingKey      = Class.new(ArgumentError)
+  MissingSecret   = Class.new(ArgumentError)
 
   UNRESERVED = /([^\w.~-]+)/
 
@@ -40,7 +40,7 @@ module Jeff
     params
       .merge(hsh)
       .sort
-      .map { |k, v| "#{k}=#{ escape v }" }
+      .map { |k, v| "#{k}=#{ escape(v) }" }
       .join('&')
   end
 
@@ -122,7 +122,7 @@ module Jeff
     [
       connection.data[:host],
       connection.data[:port]
-    ].join ':'
+    ].join(':')
   end
 
   def connection_path
@@ -143,7 +143,7 @@ module Jeff
       connection_host,
       opts[:path] || connection_path,
       query
-    ].join "\n"
+    ].join("\n")
     signature = secret.sign(string_to_sign)
 
     opts.update query: [
