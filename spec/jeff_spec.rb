@@ -93,7 +93,7 @@ describe Jeff do
 
     describe "#connection" do
       subject { client.connection }
-      let(:headers) { subject.connection[:headers] }
+      let(:headers) { subject.data[:headers] }
 
       it { should be_an Excon::Connection }
 

@@ -120,13 +120,13 @@ module Jeff
 
   def connection_host
     [
-      connection.connection[:host],
-      connection.connection[:port]
+      connection.data[:host],
+      connection.data[:port]
     ].join ':'
   end
 
   def connection_path
-    connection.connection[:path]
+    connection.data[:path]
   end
 
   def escape(val)
