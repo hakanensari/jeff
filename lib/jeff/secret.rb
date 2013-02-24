@@ -16,7 +16,7 @@ module Jeff
     private
 
     def digest(message)
-      OpenSSL::HMAC.digest SHA256, @key, message
+      OpenSSL::HMAC.digest(SHA256, @key, message)
     end
   end
 end

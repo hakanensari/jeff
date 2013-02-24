@@ -7,14 +7,6 @@
 
 ![jeff][jeff]
 
-## Usage
-
-```ruby
-class Service
-  include Jeff
-end
-```
-
 [stat]: https://secure.travis-ci.org/papercavalier/jeff.png
 [trav]: http://travis-ci.org/papercavalier/jeff
 [aws]:  http://aws.amazon.com/
