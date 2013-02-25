@@ -9,6 +9,6 @@
 
 [stat]: https://secure.travis-ci.org/papercavalier/jeff.png
 [trav]: http://travis-ci.org/papercavalier/jeff
+[sign]: http://docs.amazonwebservices.com/general/latest/gr/signature-version-2.html
 [aws]:  http://aws.amazon.com/
 [jeff]: http://f.cl.ly/items/0a3R3J0k1R2f423k1q2l/jeff.jpg
-[sign]: http://docs.amazonwebservices.com/general/latest/gr/signature-version-2.html
