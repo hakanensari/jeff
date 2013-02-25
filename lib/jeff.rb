@@ -102,17 +102,21 @@ module Jeff
     eval <<-DEF
       def #{method}(opts = {})
         opts.update :method => :#{method}
-        if opts[:body]
-          opts[:headers] ||= {}
-          opts[:headers].update 'Content-MD5' => calculate_md5(opts[:body])
-        end
-
-        connection.request(sign(opts))
+        connection.request(build_options(opts))
       end
     DEF
   end
 
   private
+
+  def build_options(opts)
+    if opts[:body]
+      opts[:headers] ||= {}
+      opts[:headers].update('Content-MD5' => calculate_md5(opts[:body]))
+    end
+
+    sign(opts)
+  end
 
   def calculate_md5(body)
     Base64.encode64(Digest::MD5.digest(body)).strip
