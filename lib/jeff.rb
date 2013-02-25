@@ -31,7 +31,7 @@ module Jeff
                  'Timestamp'        => -> { Time.now.utc.iso8601 }
   end
 
-  # Internal: Builds a sorted query.
+  # Internal: Build a sorted query.
   #
   # hsh - A hash of query parameters specific to the request.
   #
