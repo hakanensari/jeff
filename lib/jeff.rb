@@ -110,8 +110,10 @@ module Jeff
   private
 
   def build_options(opts)
+    opts[:headers] ||= {}
+    opts[:headers].update('Host' => connection_host)
+
     if opts[:body]
-      opts[:headers] ||= {}
       opts[:headers].update('Content-MD5' => calculate_md5(opts[:body]))
     end
 
@@ -123,10 +125,7 @@ module Jeff
   end
 
   def connection_host
-    [
-      connection.data[:host],
-      connection.data[:port]
-    ].join(':')
+    connection.data[:host]
   end
 
   def connection_path
