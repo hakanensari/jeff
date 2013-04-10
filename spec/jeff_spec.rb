@@ -1,167 +1,95 @@
-require 'spec_helper'
+require 'minitest/autorun'
+require 'minitest/pride'
+require 'jeff'
+
+Excon.defaults[:mock] = true
 
 describe Jeff do
-  let(:klass)  { Class.new { include Jeff } }
-  let(:client) { klass.new }
-
-  describe '.headers' do
-    subject { klass.headers }
-
-    it { should have_key 'User-Agent' }
-
-    it 'should be configurable' do
-      klass.instance_eval do
-        headers 'Foo' => 'bar'
-      end
-
-      should have_key 'Foo'
+  before do
+    @klass = Class.new do
+      include Jeff
     end
   end
 
-  describe '.params' do
-    subject { klass.params }
+  it 'has a User-Agent request header' do
+    assert @klass.headers.has_key?('User-Agent')
+  end
 
-    it { should have_key 'AWSAccessKeyId' }
+  it 'configures request headers' do
+    @klass.instance_eval do
+      headers 'Foo' => 'bar'
+    end
 
-    it { should have_key 'SignatureMethod' }
+    assert @klass.headers.has_key?('Foo')
+  end
 
-    it { should have_key 'SignatureVersion' }
+  it 'has the required request query parameters' do
+    %w(AWSAccessKeyId SignatureMethod SignatureVersion Timestamp)
+      .each { |key| assert @klass.params.has_key?(key) }
+  end
 
-    it { should have_key 'Timestamp' }
+  it 'configures the request query parameters' do
+    @klass.instance_eval do
+      params 'Foo' => 'bar'
+    end
 
-    it 'should be configurable' do
-      klass.instance_eval do
-        params 'Foo' => 'bar'
-      end
+    assert @klass.params.has_key?('Foo')
+  end
 
-      should have_key 'Foo'
+  it 'requires an endpoint' do
+    proc { @klass.new.endpoint }.must_raise Jeff::MissingEndpoint
+  end
+
+  it 'requires a key' do
+    proc { @klass.new.key }.must_raise Jeff::MissingKey
+  end
+
+  it 'requires a secret' do
+    proc { @klass.new.secret }.must_raise Jeff::MissingSecret
+  end
+
+  it 'sorts the request query parameters of the client lexicographically' do
+    client = @klass.new
+    client.key = 'foo'
+    query = client.build_query 'A10' => 1, 'A1' => 1
+
+    query.must_match(/^A1=1&A10=.*Timestamp/)
+  end
+
+  it 'sets the request headers of the client connection' do
+    client = @klass.new
+    client.endpoint = 'http://example.com/'
+
+    client.connection.data[:headers].must_equal @klass.headers
+  end
+
+  Excon::HTTP_VERBS.each do |method|
+    it "makes a #{method.upcase} request" do
+      Excon.stub({ }, { status: 200 })
+
+      client = @klass.new
+      client.endpoint = 'http://example.com/'
+      client.key = 'foo'
+      client.secret = 'bar'
+
+      client.send(method).status.must_equal 200
+
+      Excon.stubs.clear
     end
   end
 
-  describe '#endpoint' do
-    it 'should require a value' do
-      expect { client.endpoint }.to raise_error Jeff::MissingEndpoint
-    end
-  end
-
-  describe '#key' do
-    it 'should require a value' do
-      expect { client.key }.to raise_error Jeff::MissingKey
-    end
-  end
-
-  describe '#secret' do
-    it 'should require a value' do
-      expect { client.secret }.to raise_error Jeff::MissingSecret
-    end
-  end
-
-  context 'given a key' do
-    before do
-      client.key = 'key'
+  it 'adds a Content-MD5 request header if there is a request body' do
+    Excon.stub({ }) do |params|
+      { body: params[:headers]['Content-MD5'] }
     end
 
-    describe '#params' do
-      subject { client.params }
+    client = @klass.new
+    client.endpoint = 'http://example.com/'
+    client.key = 'foo'
+    client.secret = 'bar'
 
-      it 'should include the key' do
-        subject['AWSAccessKeyId'].should eql client.key
-      end
+    client.post(body: 'foo').body.wont_be_empty
 
-      it 'should generate a timestamp' do
-        subject['Timestamp'].should be_a String
-      end
-    end
-
-    describe '#build_query' do
-      subject { client.build_query 'A10' => 1, 'A1' => 1 }
-
-      it 'should include default parameters' do
-        should match(/Timestamp/)
-      end
-
-      it 'should sort lexicographically' do
-        should match(/^A1=1&A10=/)
-      end
-    end
-  end
-
-  context 'given an endpoint' do
-    before do
-      client.endpoint = 'http://slowapi.com/delay/0'
-    end
-
-    describe "#connection" do
-      subject { client.connection }
-      let(:headers) { subject.data[:headers] }
-
-      it { should be_an Excon::Connection }
-
-      it 'should set default headers' do
-        headers.should eq klass.headers
-      end
-
-      it 'should cache itself' do
-        subject.should be client.connection
-      end
-    end
-  end
-
-  context 'given an endpoint, key, and secret' do
-    before do
-      client.endpoint = 'http://slowapi.com/delay/0'
-      client.key = 'key'
-      client.secret = 'secret'
-    end
-
-    Excon::HTTP_VERBS.each do |method|
-      describe "##{method}" do
-        subject { client.send(method, mock: true).body }
-
-        before do
-          Excon.stub({ method: method.to_sym }) do
-            { body: method, status: 200 }
-          end
-        end
-
-        after { Excon.stubs.clear }
-
-        it "should make a #{method.upcase} request" do
-          should eql method
-        end
-      end
-    end
-
-    context 'given a request body' do
-      subject { client.get(mock: true, body: 'foo').body }
-
-      before do
-        Excon.stub({ method: :get }) do |params|
-          { status: 200, body: params[:headers]['Content-MD5'] }
-        end
-      end
-
-      after { Excon.stubs.clear }
-
-      it "should add an Content-MD5 header" do
-        should_not be_empty
-      end
-    end
-
-    context 'given an HTTP status error' do
-      before do
-        Excon.stub({ method: :get }) do
-          { status: 503 }
-        end
-      end
-
-      after { Excon.stubs.clear }
-
-      it "should raise an error" do
-        expect {
-          client.get mock: true
-        }.to raise_error Excon::Errors::HTTPStatusError
-      end
-    end
+    Excon.stubs.clear
   end
 end
