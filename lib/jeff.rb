@@ -111,7 +111,7 @@ module Jeff
 
   def build_options(opts)
     opts[:headers] ||= {}
-    opts[:headers].update('Host' => connection_host)
+    opts[:headers].update('Host' => connection.data[:host])
 
     if opts[:body]
       opts[:headers].update('Content-MD5' => calculate_md5(opts[:body]))
@@ -122,14 +122,6 @@ module Jeff
 
   def calculate_md5(body)
     Base64.encode64(Digest::MD5.digest(body)).strip
-  end
-
-  def connection_host
-    connection.data[:host]
-  end
-
-  def connection_path
-    connection.data[:path]
   end
 
   def escape(val)
@@ -143,8 +135,8 @@ module Jeff
 
     string_to_sign = [
       opts[:method].upcase,
-      connection_host,
-      opts[:path] || connection_path,
+      connection.data[:host],
+      opts[:path] || connection.data[:path],
       query
     ].join("\n")
     signature = secret.sign(string_to_sign)
