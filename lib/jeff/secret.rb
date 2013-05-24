@@ -10,13 +10,8 @@ module Jeff
     end
 
     def sign(message)
-      Base64.encode64(digest(message)).chomp
-    end
-
-    private
-
-    def digest(message)
-      OpenSSL::HMAC.digest(SHA256, @key, message)
+      digest = OpenSSL::HMAC.digest(SHA256, @key, message)
+      Base64.encode64(digest).chomp
     end
   end
 end
