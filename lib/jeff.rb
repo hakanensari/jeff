@@ -101,7 +101,7 @@ module Jeff
   Excon::HTTP_VERBS.each do |method|
     eval <<-DEF
       def #{method}(opts = {})
-        opts.update :method => :#{method}
+        opts.update(:method => :#{method}, :omit_default_port => true)
         connection.request(build_options(opts))
       end
     DEF
@@ -110,10 +110,8 @@ module Jeff
   private
 
   def build_options(opts)
-    opts[:headers] ||= {}
-    opts[:headers].update('Host' => connection.data[:host])
-
     if opts[:body]
+      opts[:headers] ||= {}
       opts[:headers].update('Content-MD5' => calculate_md5(opts[:body]))
     end
 
@@ -141,10 +139,10 @@ module Jeff
     ].join("\n")
     signature = secret.sign(string_to_sign)
 
-    opts.update query: [
+    opts.update(query: [
        query,
        "Signature=#{escape(signature)}"
-    ].join('&')
+    ].join('&'))
   end
 
   module ClassMethods
