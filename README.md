@@ -3,6 +3,8 @@
 [Serially or in parallel, Monsieur Jeff will diligently sign your Amazon Web
 Services requests.][sign]
 
+:heart::heart::heart:
+
 ![jeff][jeff]
 
 [sign]: http://docs.amazonwebservices.com/general/latest/gr/signature-version-2.html
