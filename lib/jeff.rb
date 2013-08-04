@@ -45,23 +45,11 @@ module Jeff
     @connection ||= Excon.new(endpoint, headers: headers, expects: 200)
   end
 
-  # Internal: Returns the Hash default headers.
-  def headers
-    self.class.headers
-  end
-
   # Gets/Sets the String AWS endpoint.
   attr_accessor :endpoint
 
   # Gets/Sets the String AWS access key id.
   attr_accessor :key
-
-  # Internal: Returns the Hash default request parameters.
-  def params
-    self.class.params.reduce({}) do |a, (k, v)|
-      a.update k => (v.respond_to?(:call) ? instance_exec(&v) : v)
-    end
-  end
 
   # Internal: Gets the Jeff::Secret.
   #
@@ -90,6 +78,16 @@ module Jeff
   end
 
   private
+
+  def headers
+    self.class.headers
+  end
+
+  def params
+    self.class.params.reduce({}) do |a, (k, v)|
+      a.update k => (v.respond_to?(:call) ? instance_exec(&v) : v)
+    end
+  end
 
   def build_options(opts)
     if opts[:body]
