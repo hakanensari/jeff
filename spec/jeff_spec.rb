@@ -36,18 +36,6 @@ describe Jeff do
     assert @klass.params.has_key?('Foo')
   end
 
-  it 'requires an endpoint' do
-    proc { @klass.new.endpoint }.must_raise Jeff::MissingEndpoint
-  end
-
-  it 'requires a key' do
-    proc { @klass.new.key }.must_raise Jeff::MissingKey
-  end
-
-  it 'requires a secret' do
-    proc { @klass.new.secret }.must_raise Jeff::MissingSecret
-  end
-
   it 'sorts the request query parameters of the client lexicographically' do
     client = @klass.new
     client.key = 'foo'

@@ -8,10 +8,6 @@ require 'jeff/version'
 
 # Mixes in Amazon Web Services (AWS) client behaviour.
 module Jeff
-  MissingEndpoint = Class.new(ArgumentError)
-  MissingKey      = Class.new(ArgumentError)
-  MissingSecret   = Class.new(ArgumentError)
-
   UNRESERVED = /([^\w.~-]+)/
 
   # A User-Agent header that identifies the application, its version number,
@@ -49,30 +45,16 @@ module Jeff
     @connection ||= Excon.new(endpoint, headers: headers, expects: 200)
   end
 
-  # Internal: Gets the String AWS endpoint.
-  #
-  # Raises a MissingEndpoint error if endpoint is missing.
-  def endpoint
-    @endpoint or raise MissingEndpoint
-  end
-
-  # Sets the String AWS endpoint.
-  attr_writer :endpoint
-
   # Internal: Returns the Hash default headers.
   def headers
     self.class.headers
   end
 
-  # Internal: Gets the String AWS access key id.
-  #
-  # Raises a MissingKey error if key is missing.
-  def key
-    @key or raise MissingKey
-  end
+  # Gets/Sets the String AWS endpoint.
+  attr_accessor :endpoint
 
-  # Sets the String AWS access key id.
-  attr_writer :key
+  # Gets/Sets the String AWS access key id.
+  attr_accessor :key
 
   # Internal: Returns the Hash default request parameters.
   def params
@@ -85,7 +67,7 @@ module Jeff
   #
   # Raises a MissingSecret error if secret is missing.
   def secret
-    @secret or raise MissingSecret
+    @secret
   end
 
   # Sets the AWS secret key.
