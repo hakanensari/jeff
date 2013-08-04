@@ -15,10 +15,7 @@ module Jeff
   # Converts a query value to a sorted query string.
   Query = Struct.new(:values) do
     def to_s
-      values
-        .sort
-        .map { |k, v| "#{k}=#{ Utils.escape(v) }" }
-        .join('&')
+      values.sort.map { |k, v| "#{k}=#{ Utils.escape(v) }" }.join('&')
     end
   end
 
