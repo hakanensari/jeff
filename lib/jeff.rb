@@ -1,11 +1,37 @@
-require 'base64'
-require 'digest/md5'
+# Our only external dependency. Excon is currently my preferred HTTP client in
+# Ruby.
 require 'excon'
+
+# Standard library dependencies.
+require 'base64'
 require 'openssl'
 require 'time'
 
-# Mixes in Amazon Web Services (AWS) client behaviour.
+# Jeff mixes in client behaviour for Amazon Web Services (AWS) that require
+# Signature version 2 authentication.
+#
+# It's Jeff, as in Jeff Bezos.
 module Jeff
+  # Converts a query value to a sorted query string.
+  Query = Struct.new(:values) do
+    def to_s
+      values
+        .sort
+        .map { |k, v| "#{k}=#{ Utils.escape(v) }" }
+        .join('&')
+    end
+  end
+
+  # Calculates a RFC 2104-compliant HMAC signature.
+  module Signature
+    SHA256 = OpenSSL::Digest::SHA256.new
+
+    def self.calculate(secret, message)
+      Base64.encode64(OpenSSL::HMAC.digest(SHA256, secret, message)).strip
+    end
+  end
+
+  # Because Ruby's CGI escapes ~, we have to resort to writing our own escape.
   module Utils
     UNRESERVED = /([^\w.~-]+)/
 
@@ -16,34 +42,23 @@ module Jeff
     end
   end
 
-  module Signature
-    SHA256 = OpenSSL::Digest::SHA256.new
-
-    def self.calculate(secret, message)
-      Base64.encode64(OpenSSL::HMAC.digest(SHA256, secret, message)).strip
-    end
-  end
-
-  Query = Struct.new(:values) do
-    def to_s
-      values
-        .sort
-        .map { |k, v| "#{k}=#{ Utils.escape(v) }" }
-        .join('&')
-    end
-  end
-
-  # Jeff's version.
+  # Jeff's current version.
   VERSION = '0.6.4'
 
-  # Amazon recommends to include a User-Agent header that identifies the
-  # application, its version number, and programming language.
+  # Amazon recommends to include a User-Agent header with every request to 
+  # identify the application, its version number, programming language, and
+  # host.
+  #
+  # If not happy, override.
   USER_AGENT = "Jeff/#{VERSION} (Language=Ruby; #{`hostname`.chomp})"
 
   def self.included(base)
     base.extend(ClassMethods)
 
-    # These are the common parameters required by all AWS requests.
+    # Common parameters required by all AWS requests.
+    #
+    # Add other common parameters using `Jeff.params` if required in your
+    # implementation.
     base.params(
       'AWSAccessKeyId'   => -> { aws_access_key_id },
       'SignatureVersion' => '2',
@@ -52,7 +67,8 @@ module Jeff
     )
   end
 
-  # Internal: Returns an Excon::Connection.
+  # A HTTP connection. It's reusable, which, as the author of Excon puts it, is
+  # more performant!
   def connection
     @connection ||= Excon.new(endpoint,
       headers: { 'User-Agent' => USER_AGENT },
@@ -61,20 +77,14 @@ module Jeff
     )
   end
 
-  # Gets/Sets the String AWS endpoint.
-  #
-  # This, in URL parlance, is the scheme and the host.
-  attr_accessor :aws_endpoint
-  alias endpoint aws_endpoint
+  # Accessors for required AWS attributes.
+  attr_accessor :aws_endpoint, :aws_access_key_id, :aws_secret_access_key
 
-  # Gets/Sets the String AWS access key id.
-  attr_accessor :aws_access_key_id
+  # We'll keep these around so we don't break dependent libraries.
+  alias endpoint aws_endpoint
   alias endpoint= aws_endpoint=
   alias key aws_access_key_id
   alias key= aws_access_key_id=
-
-  # Gets/Sets the String AWS secret key.
-  attr_accessor :aws_secret_access_key
   alias secret aws_secret_access_key
   alias secret= aws_secret_access_key=
 
@@ -93,7 +103,7 @@ module Jeff
   def build_options(options)
     if options[:body]
       options[:headers] ||= {}
-      digest = Base64.encode64(Digest::MD5.digest(options[:body])).strip
+      digest = Base64.encode64(OpenSSL::Digest::MD5.digest(options[:body])).strip
       options[:headers].store('Content-MD5', digest)
     end
 
@@ -118,10 +128,6 @@ module Jeff
 
   module ClassMethods
     # Gets/Updates the default request parameters.
-    #
-    # hsh - A Hash of parameters (default: nil).
-    #
-    # Returns the Hash parameters.
     def params(hsh = nil)
       @params ||= {}
       @params.update(hsh) if hsh
