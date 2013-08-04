@@ -125,11 +125,6 @@ module Jeff
       (options[:headers] ||= {}).store('Content-MD5', md5)
     end
 
-
-    options.update(query: [
-       query,
-       "Signature=#{Utils.escape(signature)}"
-    ].join('&'))
     # Build the query string.
     values = self.class.params
       .reduce({}) { |a, (k, v)|
@@ -147,6 +142,9 @@ module Jeff
         query_string
       )
       .sign(aws_secret_access_key)
+
+    # Return options after appending an escaped signature to query.
+    options.update(query: "#{query_string}&Signature=#{Utils.escape(signature)}")
   end
 
   module ClassMethods
