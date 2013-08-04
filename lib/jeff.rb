@@ -66,10 +66,10 @@ module Jeff
   # This, in URL parlance, is the scheme and the host.
   attr_accessor :aws_endpoint
   alias endpoint aws_endpoint
-  alias endpoint aws_endpoint
 
   # Gets/Sets the String AWS access key id.
   attr_accessor :aws_access_key_id
+  alias endpoint= aws_endpoint=
   alias key aws_access_key_id
   alias key= aws_access_key_id=
 
