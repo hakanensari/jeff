@@ -81,17 +81,15 @@ module Jeff
 
   private
 
-  def params
-    self.class.params.reduce({}) do |a, (k, v)|
-      a.update k => (v.respond_to?(:call) ? instance_exec(&v) : v)
-    end
-  end
-
   def build_options(opts)
     if opts[:body]
       opts[:headers] ||= {}
       digest = Base64.encode64(Digest::MD5.digest(opts[:body])).strip
       opts[:headers].store('Content-MD5', digest)
+    end
+
+    params = self.class.params.reduce({}) do |a, (k, v)|
+      a.update k => (v.respond_to?(:call) ? instance_exec(&v) : v)
     end
 
     query = Query.new(params.merge(opts.fetch(:query, {}))).to_s
