@@ -37,7 +37,7 @@ module Jeff
     end
   end
 
-  # Calculates a RFC 2104-compliant HMAC signature.
+  # Calculates an RFC 2104-compliant HMAC signature.
   Signature = Struct.new(:secret) do
     SHA256 = OpenSSL::Digest::SHA256.new
 
