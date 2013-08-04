@@ -29,6 +29,17 @@ module Jeff
     end
   end
 
+  # Signs an AWS request.
+  Request = Struct.new(:method, :host, :path, :query_string) do
+    def sign(aws_secret_access_key)
+      Signature.new(aws_secret_access_key).sign(string_to_sign)
+    end
+
+    def string_to_sign
+      [method, host, path, query_string].join("\n")
+    end
+  end
+
   # Calculates a RFC 2104-compliant HMAC signature.
   Signature = Struct.new(:secret) do
     SHA256 = OpenSSL::Digest::SHA256.new
@@ -114,13 +125,6 @@ module Jeff
       (options[:headers] ||= {}).store('Content-MD5', md5)
     end
 
-    string_to_sign = [
-      options[:method].upcase,
-      connection.data[:host],
-      options[:path] || connection.data[:path],
-      query
-    ].join("\n")
-    signature = Signature.new(aws_secret_access_key).sign(string_to_sign)
 
     options.update(query: [
        query,
@@ -134,6 +138,15 @@ module Jeff
       .merge(options.fetch(:query, {}))
     query_string = Query.new(values).to_s
 
+    # Generate a signature.
+    signature = Request
+      .new(
+        options[:method].upcase,
+        connection.data[:host],
+        options[:path] || connection.data[:path],
+        query_string
+      )
+      .sign(aws_secret_access_key)
   end
 
   module ClassMethods
