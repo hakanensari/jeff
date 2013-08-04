@@ -35,19 +35,20 @@ module Jeff
     end
   end
 
-  # A User-Agent header that identifies the application, its version number,
-  # and programming language.
-  #
-  # Amazon recommends to include one in requests to AWS endpoints.
+  # Amazon recommends to include a User-Agent header that identifies the
+  # application, its version number, and programming language.
   USER_AGENT = "Jeff/#{VERSION} (Language=Ruby; #{`hostname`.chomp})"
 
   def self.included(base)
-    base.extend ClassMethods
+    base.extend(ClassMethods)
 
-    base.params  'AWSAccessKeyId'   => -> { key },
-                 'SignatureVersion' => '2',
-                 'SignatureMethod'  => 'HmacSHA256',
-                 'Timestamp'        => -> { Time.now.utc.iso8601 }
+    # These are the common parameters required by all AWS requests.
+    base.params(
+      'AWSAccessKeyId'   => -> { key },
+      'SignatureVersion' => '2',
+      'SignatureMethod'  => 'HmacSHA256',
+      'Timestamp'        => -> { Time.now.utc.iso8601 }
+    )
   end
 
   # Internal: Build a sorted query.
