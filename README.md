@@ -12,6 +12,8 @@ The following is a minimal example:
 ```ruby
 Request = Struct.new(:key, :secret) do
   include Jeff
+
+  def endpoint; 'http://localhost'; end
 end
 
 req = Request.new('key', 'secret')
