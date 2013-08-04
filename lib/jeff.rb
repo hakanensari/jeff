@@ -127,12 +127,9 @@ module Jeff
   end
 
   module ClassMethods
-    # Gets/Updates the default request parameters.
-    def params(hsh = nil)
-      @params ||= {}
-      @params.update(hsh) if hsh
-
-      @params
+    # Gets and optionally updates the default request parameters.
+    def params(hsh = {})
+      (@params ||= {}).update(hsh)
     end
   end
 end
