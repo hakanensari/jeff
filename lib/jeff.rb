@@ -23,10 +23,10 @@ module Jeff
   end
 
   # Calculates a RFC 2104-compliant HMAC signature.
-  module Signature
+  Signature = Struct.new(:secret) do
     SHA256 = OpenSSL::Digest::SHA256.new
 
-    def self.calculate(secret, message)
+    def sign(message)
       Base64.encode64(OpenSSL::HMAC.digest(SHA256, secret, message)).strip
     end
   end
@@ -118,7 +118,7 @@ module Jeff
       options[:path] || connection.data[:path],
       query
     ].join("\n")
-    signature = Signature.calculate(aws_secret_access_key, string_to_sign)
+    signature = Signature.new(aws_secret_access_key).sign(string_to_sign)
 
     options.update(query: [
        query,
