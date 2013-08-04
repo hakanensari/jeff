@@ -8,7 +8,15 @@ require 'jeff/version'
 
 # Mixes in Amazon Web Services (AWS) client behaviour.
 module Jeff
-  UNRESERVED = /([^\w.~-]+)/
+  module Utils
+    UNRESERVED = /([^\w.~-]+)/
+
+    def self.escape(val)
+      val.to_s.gsub(UNRESERVED) do
+        '%' + $1.unpack('H2' * $1.bytesize).join('%').upcase
+      end
+    end
+  end
 
   # A User-Agent header that identifies the application, its version number,
   # and programming language.
@@ -36,7 +44,7 @@ module Jeff
     params
       .merge(hsh)
       .sort
-      .map { |k, v| "#{k}=#{ escape(v) }" }
+      .map { |k, v| "#{k}=#{ Utils.escape(v) }" }
       .join('&')
   end
 
@@ -102,12 +110,6 @@ module Jeff
     Base64.encode64(Digest::MD5.digest(body)).strip
   end
 
-  def escape(val)
-    val.to_s.gsub(UNRESERVED) do
-      '%' + $1.unpack('H2' * $1.bytesize).join('%').upcase
-    end
-  end
-
   def sign(opts)
     query = build_query(opts[:query] || {})
 
@@ -121,7 +123,7 @@ module Jeff
 
     opts.update(query: [
        query,
-       "Signature=#{escape(signature)}"
+       "Signature=#{Utils.escape(signature)}"
     ].join('&'))
   end
 
