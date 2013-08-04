@@ -25,11 +25,8 @@ describe Jeff do
   end
 
   it 'sorts the request query parameters of the client lexicographically' do
-    client = @klass.new
-    client.key = 'foo'
-    query = client.build_query 'A10' => 1, 'A1' => 1
-
-    query.must_match(/^A1=1&A10=.*Timestamp/)
+    query = Jeff::Query.new('A10' => 1, 'A1' => 1)
+    query.to_s.must_equal('A1=1&A10=1')
   end
 
   it 'sets a User-Agent header for the client connection' do

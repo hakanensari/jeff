@@ -51,15 +51,6 @@ module Jeff
     )
   end
 
-  # Internal: Build a sorted query.
-  #
-  # hsh - A hash of query parameters specific to the request.
-  #
-  # Returns a query String.
-  def build_query(hsh)
-    Query.new(params.merge(hsh)).to_s
-  end
-
   # Internal: Returns an Excon::Connection.
   def connection
     @connection ||= Excon.new(endpoint,
@@ -110,8 +101,7 @@ module Jeff
   end
 
   def sign(opts)
-    query = build_query(opts[:query] || {})
-
+    query = Query.new(params.merge(opts.fetch(:query, {}))).to_s
     string_to_sign = [
       opts[:method].upcase,
       connection.data[:host],
