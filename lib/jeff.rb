@@ -61,8 +61,11 @@ module Jeff
 
   # Internal: Returns an Excon::Connection.
   def connection
-    headers = { 'User-Agent' => USER_AGENT }
-    @connection ||= Excon.new(endpoint, headers: headers, expects: 200)
+    @connection ||= Excon.new(endpoint,
+      headers: { 'User-Agent' => USER_AGENT },
+      expects: 200,
+      omit_default_port: true
+    )
   end
 
   # Gets/Sets the String AWS endpoint.
@@ -78,7 +81,7 @@ module Jeff
   Excon::HTTP_VERBS.each do |method|
     eval <<-DEF
       def #{method}(opts = {})
-        opts.update(:method => :#{method}, :omit_default_port => true)
+        opts.store(:method, :#{method})
         connection.request(build_options(opts))
       end
     DEF
