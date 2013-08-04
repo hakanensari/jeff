@@ -22,6 +22,13 @@ module Jeff
     end
   end
 
+  # Calculates an MD5sum for file being uploaded.
+  Content = Struct.new(:body) do
+    def md5
+      Base64.encode64(OpenSSL::Digest::MD5.digest(body)).strip
+    end
+  end
+
   # Calculates a RFC 2104-compliant HMAC signature.
   Signature = Struct.new(:secret) do
     SHA256 = OpenSSL::Digest::SHA256.new
@@ -101,10 +108,10 @@ module Jeff
   private
 
   def build_options(options)
-    if options[:body]
-      options[:headers] ||= {}
-      digest = Base64.encode64(OpenSSL::Digest::MD5.digest(options[:body])).strip
-      options[:headers].store('Content-MD5', digest)
+    # Add a Content-MD5 header if we're uploading a file.
+    if options.has_key?(:body)
+      md5 = Content.new(options[:body]).md5
+      (options[:headers] ||= {}).store('Content-MD5', md5)
     end
 
     params = self.class.params.reduce({}) do |a, (k, v)|
