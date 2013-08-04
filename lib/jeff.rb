@@ -44,8 +44,6 @@ module Jeff
   def self.included(base)
     base.extend ClassMethods
 
-    base.headers 'User-Agent'       => USER_AGENT
-
     base.params  'AWSAccessKeyId'   => -> { key },
                  'SignatureVersion' => '2',
                  'SignatureMethod'  => 'HmacSHA256',
@@ -63,6 +61,7 @@ module Jeff
 
   # Internal: Returns an Excon::Connection.
   def connection
+    headers = { 'User-Agent' => USER_AGENT }
     @connection ||= Excon.new(endpoint, headers: headers, expects: 200)
   end
 
@@ -86,10 +85,6 @@ module Jeff
   end
 
   private
-
-  def headers
-    self.class.headers
-  end
 
   def params
     self.class.params.reduce({}) do |a, (k, v)|
@@ -128,18 +123,6 @@ module Jeff
   end
 
   module ClassMethods
-    # Gets/Updates the default headers.
-    #
-    # hsh - A Hash of headers.
-    #
-    # Returns the Hash headers.
-    def headers(hsh = nil)
-      @headers ||= {}
-      @headers.update(hsh) if hsh
-
-      @headers
-    end
-
     # Gets/Updates the default request parameters.
     #
     # hsh - A Hash of parameters (default: nil).

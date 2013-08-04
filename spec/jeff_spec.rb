@@ -11,18 +11,6 @@ describe Jeff do
     end
   end
 
-  it 'has a User-Agent request header' do
-    assert @klass.headers.has_key?('User-Agent')
-  end
-
-  it 'configures request headers' do
-    @klass.instance_eval do
-      headers 'Foo' => 'bar'
-    end
-
-    assert @klass.headers.has_key?('Foo')
-  end
-
   it 'has the required request query parameters' do
     %w(AWSAccessKeyId SignatureMethod SignatureVersion Timestamp)
       .each { |key| assert @klass.params.has_key?(key) }
@@ -44,11 +32,11 @@ describe Jeff do
     query.must_match(/^A1=1&A10=.*Timestamp/)
   end
 
-  it 'sets the request headers of the client connection' do
+  it 'sets a User-Agent header for the client connection' do
     client = @klass.new
     client.endpoint = 'http://example.com/'
 
-    client.connection.data[:headers].must_equal @klass.headers
+    client.connection.data[:headers]['User-Agent'].wont_be_nil
   end
 
   Excon::HTTP_VERBS.each do |method|
