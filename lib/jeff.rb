@@ -72,36 +72,36 @@ module Jeff
   # Generate HTTP request verb methods.
   Excon::HTTP_VERBS.each do |method|
     eval <<-DEF
-      def #{method}(opts = {})
-        opts.store(:method, :#{method})
-        connection.request(build_options(opts))
+      def #{method}(options = {})
+        options.store(:method, :#{method})
+        connection.request(build_options(options))
       end
     DEF
   end
 
   private
 
-  def build_options(opts)
-    if opts[:body]
-      opts[:headers] ||= {}
-      digest = Base64.encode64(Digest::MD5.digest(opts[:body])).strip
-      opts[:headers].store('Content-MD5', digest)
+  def build_options(options)
+    if options[:body]
+      options[:headers] ||= {}
+      digest = Base64.encode64(Digest::MD5.digest(options[:body])).strip
+      options[:headers].store('Content-MD5', digest)
     end
 
     params = self.class.params.reduce({}) do |a, (k, v)|
       a.update k => (v.respond_to?(:call) ? instance_exec(&v) : v)
     end
 
-    query = Query.new(params.merge(opts.fetch(:query, {}))).to_s
+    query = Query.new(params.merge(options.fetch(:query, {}))).to_s
     string_to_sign = [
-      opts[:method].upcase,
+      options[:method].upcase,
       connection.data[:host],
-      opts[:path] || connection.data[:path],
+      options[:path] || connection.data[:path],
       query
     ].join("\n")
     signature = Signature.calculate(secret, string_to_sign)
 
-    opts.update(query: [
+    options.update(query: [
        query,
        "Signature=#{Utils.escape(signature)}"
     ].join('&'))
