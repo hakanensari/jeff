@@ -26,6 +26,15 @@ module Jeff
     end
   end
 
+  Query = Struct.new(:values) do
+    def to_s
+      values
+        .sort
+        .map { |k, v| "#{k}=#{ Utils.escape(v) }" }
+        .join('&')
+    end
+  end
+
   # A User-Agent header that identifies the application, its version number,
   # and programming language.
   #
@@ -49,11 +58,7 @@ module Jeff
   #
   # Returns a query String.
   def build_query(hsh)
-    params
-      .merge(hsh)
-      .sort
-      .map { |k, v| "#{k}=#{ Utils.escape(v) }" }
-      .join('&')
+    Query.new(params.merge(hsh)).to_s
   end
 
   # Internal: Returns an Excon::Connection.
