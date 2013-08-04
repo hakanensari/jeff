@@ -1,9 +1,9 @@
 require 'base64'
 require 'digest/md5'
 require 'excon'
+require 'openssl'
 require 'time'
 
-require 'jeff/secret'
 require 'jeff/version'
 
 # Mixes in Amazon Web Services (AWS) client behaviour.
@@ -15,6 +15,14 @@ module Jeff
       val.to_s.gsub(UNRESERVED) do
         '%' + $1.unpack('H2' * $1.bytesize).join('%').upcase
       end
+    end
+  end
+
+  module Signature
+    SHA256 = OpenSSL::Digest::SHA256.new
+
+    def self.calculate(secret, message)
+      OpenSSL::HMAC.hexdigest(SHA256, secret, message)
     end
   end
 
@@ -59,21 +67,8 @@ module Jeff
   # Gets/Sets the String AWS access key id.
   attr_accessor :key
 
-  # Internal: Gets the Jeff::Secret.
-  #
-  # Raises a MissingSecret error if secret is missing.
-  def secret
-    @secret
-  end
-
-  # Sets the AWS secret key.
-  #
-  # key - A String secret.
-  #
-  # Returns a Jeff::Secret.
-  def secret=(key)
-    @secret = Secret.new(key)
-  end
+  # Gets/Sets the String AWS secret key.
+  attr_accessor :secret
 
   # Generate HTTP request verb methods.
   Excon::HTTP_VERBS.each do |method|
@@ -119,7 +114,7 @@ module Jeff
       opts[:path] || connection.data[:path],
       query
     ].join("\n")
-    signature = secret.sign(string_to_sign)
+    signature = Signature.calculate(secret, string_to_sign)
 
     opts.update(query: [
        query,
