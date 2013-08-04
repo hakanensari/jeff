@@ -90,7 +90,8 @@ module Jeff
   def build_options(opts)
     if opts[:body]
       opts[:headers] ||= {}
-      opts[:headers].update('Content-MD5' => calculate_md5(opts[:body]))
+      digest = Base64.encode64(Digest::MD5.digest(opts[:body])).strip
+      opts[:headers].store('Content-MD5', digest)
     end
 
     query = Query.new(params.merge(opts.fetch(:query, {}))).to_s
@@ -106,10 +107,6 @@ module Jeff
        query,
        "Signature=#{Utils.escape(signature)}"
     ].join('&'))
-  end
-
-  def calculate_md5(body)
-    Base64.encode64(Digest::MD5.digest(body)).strip
   end
 
   module ClassMethods
