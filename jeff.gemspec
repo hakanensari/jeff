@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 $:.push File.expand_path('../lib', __FILE__)
-require File.expand_path('../lib/jeff/version.rb', __FILE__)
+require File.expand_path('../lib/jeff.rb', __FILE__)
 
 Gem::Specification.new do |gem|
   gem.authors       = ['Hakan Ensari']

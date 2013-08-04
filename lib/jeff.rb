@@ -4,8 +4,6 @@ require 'excon'
 require 'openssl'
 require 'time'
 
-require 'jeff/version'
-
 # Mixes in Amazon Web Services (AWS) client behaviour.
 module Jeff
   module Utils
@@ -34,6 +32,9 @@ module Jeff
         .join('&')
     end
   end
+
+  # Jeff's version.
+  VERSION = '0.6.4'
 
   # Amazon recommends to include a User-Agent header that identifies the
   # application, its version number, and programming language.
