@@ -82,8 +82,8 @@ module Jeff
     )
   end
 
-  # A HTTP connection. It's reusable, which, as the author of Excon puts it, is
-  # more performant!
+  # An HTTP connection. It's reusable, which, as the author of Excon puts it,
+  # is more performant!
   def connection
     @connection ||= Excon.new(endpoint,
       headers: { 'User-Agent' => USER_AGENT },
