@@ -44,7 +44,7 @@ module Jeff
 
     # These are the common parameters required by all AWS requests.
     base.params(
-      'AWSAccessKeyId'   => -> { key },
+      'AWSAccessKeyId'   => -> { aws_access_key_id },
       'SignatureVersion' => '2',
       'SignatureMethod'  => 'HmacSHA256',
       'Timestamp'        => -> { Time.now.utc.iso8601 }
@@ -64,10 +64,14 @@ module Jeff
   attr_accessor :endpoint
 
   # Gets/Sets the String AWS access key id.
-  attr_accessor :key
+  attr_accessor :aws_access_key_id
+  alias key aws_access_key_id
+  alias key= aws_access_key_id=
 
   # Gets/Sets the String AWS secret key.
-  attr_accessor :secret
+  attr_accessor :aws_secret_access_key
+  alias secret aws_secret_access_key
+  alias secret= aws_secret_access_key=
 
   # Generate HTTP request verb methods.
   Excon::HTTP_VERBS.each do |method|
@@ -99,7 +103,7 @@ module Jeff
       options[:path] || connection.data[:path],
       query
     ].join("\n")
-    signature = Signature.calculate(secret, string_to_sign)
+    signature = Signature.calculate(aws_secret_access_key, string_to_sign)
 
     options.update(query: [
        query,
