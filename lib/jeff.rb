@@ -114,11 +114,6 @@ module Jeff
       (options[:headers] ||= {}).store('Content-MD5', md5)
     end
 
-    params = self.class.params.reduce({}) do |a, (k, v)|
-      a.update k => (v.respond_to?(:call) ? instance_exec(&v) : v)
-    end
-
-    query = Query.new(params.merge(options.fetch(:query, {}))).to_s
     string_to_sign = [
       options[:method].upcase,
       connection.data[:host],
@@ -131,6 +126,14 @@ module Jeff
        query,
        "Signature=#{Utils.escape(signature)}"
     ].join('&'))
+    # Build the query string.
+    values = self.class.params
+      .reduce({}) { |a, (k, v)|
+        a.update(k => (v.respond_to?(:call) ? instance_exec(&v) : v))
+      }
+      .merge(options.fetch(:query, {}))
+    query_string = Query.new(values).to_s
+
   end
 
   module ClassMethods
