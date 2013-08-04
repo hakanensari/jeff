@@ -61,7 +61,11 @@ module Jeff
   end
 
   # Gets/Sets the String AWS endpoint.
-  attr_accessor :endpoint
+  #
+  # This, in URL parlance, is the scheme and the host.
+  attr_accessor :aws_endpoint
+  alias endpoint aws_endpoint
+  alias endpoint aws_endpoint
 
   # Gets/Sets the String AWS access key id.
   attr_accessor :aws_access_key_id
