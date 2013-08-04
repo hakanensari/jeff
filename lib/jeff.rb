@@ -93,14 +93,6 @@ module Jeff
       opts[:headers].update('Content-MD5' => calculate_md5(opts[:body]))
     end
 
-    sign(opts)
-  end
-
-  def calculate_md5(body)
-    Base64.encode64(Digest::MD5.digest(body)).strip
-  end
-
-  def sign(opts)
     query = Query.new(params.merge(opts.fetch(:query, {}))).to_s
     string_to_sign = [
       opts[:method].upcase,
@@ -114,6 +106,10 @@ module Jeff
        query,
        "Signature=#{Utils.escape(signature)}"
     ].join('&'))
+  end
+
+  def calculate_md5(body)
+    Base64.encode64(Digest::MD5.digest(body)).strip
   end
 
   module ClassMethods
