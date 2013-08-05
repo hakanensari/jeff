@@ -1,28 +1,29 @@
 # Jeff
 
-Jeff mixes in client behaviour for [Amazon Web Services (AWS)][aws] that
-require [Signature version 2 authentication][sig].
+Jeff mixes in client behaviour for Amazon Web Services (AWS) which require
+[Signature version 2 authentication][sig].
 
 ![jeff][jef]
 
 ## Usage
 
-The following is a minimal example:
+A minimal example:
 
 ```ruby
-Request = Struct.new(:key, :secret) do
+Request = Struct.new(:aws_access_key_id, :aws_secret_access_key) do
   include Jeff
 
-  def endpoint; 'http://localhost'; end
+  def aws_endpoint; 'https://mws.amazonservices.com/Products/2011-10-01'; end
 end
 
-req = Request.new('key', 'secret')
-res = req.get(query: { 'Foo' => 'Bar' })
+req = Request.new('foo', 'bar')
+res = req.get(query: { 'Action' => 'GetServiceStatus' })
+
+puts res.body.match(/Status>([^<]+)/)[1]
 ```
 
-Read the source code of [Vacuum][vac] for a more material implementation.
+[Vacuum][vac] provides an example implementation.
 
-[aws]:  http://aws.amazon.com/
 [sig]: http://docs.amazonwebservices.com/general/latest/gr/signature-version-2.html
 [vac]: https://github.com/hakanensari/vacuum
 [jef]: http://f.cl.ly/items/0a3R3J0k1R2f423k1q2l/jeff.jpg
