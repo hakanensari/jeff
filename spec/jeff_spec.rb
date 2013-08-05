@@ -20,7 +20,6 @@ describe Jeff do
     @klass.instance_eval do
       params 'Foo' => 'bar'
     end
-
     assert @klass.params.has_key?('Foo')
   end
 
@@ -32,21 +31,17 @@ describe Jeff do
   it 'sets a User-Agent header for the client connection' do
     client = @klass.new
     client.endpoint = 'http://example.com/'
-
     client.connection.data[:headers]['User-Agent'].wont_be_nil
   end
 
   Excon::HTTP_VERBS.each do |method|
     it "makes a #{method.upcase} request" do
       Excon.stub({ }, { status: 200 })
-
       client = @klass.new
       client.endpoint = 'http://example.com/'
       client.key = 'foo'
       client.secret = 'bar'
-
       client.send(method).status.must_equal 200
-
       Excon.stubs.clear
     end
   end
@@ -55,14 +50,11 @@ describe Jeff do
     Excon.stub({ }) do |params|
       { body: params[:headers]['Content-MD5'] }
     end
-
     client = @klass.new
     client.endpoint = 'http://example.com/'
     client.key = 'foo'
     client.secret = 'bar'
-
     client.post(body: 'foo').body.wont_be_empty
-
     Excon.stubs.clear
   end
 end

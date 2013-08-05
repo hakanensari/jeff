@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.authors       = ['Hakan Ensari']
   gem.email         = ['hakan.ensari@papercavalier.com']
   gem.description   = %q{An Amazon Web Services client}
-  gem.summary       = %q{AWS client}
+  gem.summary       = %q{An AWS client}
   gem.homepage      = 'https://github.com/papercavalier/jeff'
 
   gem.files         = `git ls-files`.split($\)
@@ -16,6 +16,8 @@ Gem::Specification.new do |gem|
   gem.version       = Jeff::VERSION
 
   gem.add_dependency 'excon', '~> 0.25.0'
+  gem.add_development_dependency 'minitest'
+  gem.add_development_dependency 'rake'
 
   gem.required_ruby_version = '>= 1.9'
 end
