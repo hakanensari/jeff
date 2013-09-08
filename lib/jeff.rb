@@ -40,11 +40,19 @@ module Jeff
   end
 
   # Calculates an RFC 2104-compliant HMAC signature.
-  Signature = Struct.new(:secret) do
+  class Signature
     SHA256 = OpenSSL::Digest::SHA256.new
+
+    def initialize(secret)
+      @secret = secret
+    end
 
     def sign(message)
       Base64.encode64(OpenSSL::HMAC.digest(SHA256, secret, message)).strip
+    end
+
+    def secret
+      @secret or raise ArgumentError, 'Missing secret'
     end
   end
 

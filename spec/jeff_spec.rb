@@ -23,6 +23,11 @@ describe Jeff do
     assert @klass.params.has_key?('Foo')
   end
 
+  it 'requires a signature' do
+    sig = Jeff::Signature.new(nil)
+    proc { sig.sign('foo') }.must_raise ArgumentError
+  end
+
   it 'sorts the request query parameters of the client lexicographically' do
     query = Jeff::Query.new('A10' => 1, 'A1' => 1)
     query.to_s.must_equal('A1=1&A10=1')
