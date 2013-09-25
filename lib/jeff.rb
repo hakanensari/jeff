@@ -15,22 +15,43 @@ require 'jeff/version'
 # It's Jeff, as in Jeff Bezos.
 module Jeff
   # Converts a query value to a sorted query string.
-  Query = Struct.new(:values) do
+  class Query
+    attr :values
+
+    def initialize(values)
+      @values = values
+    end
+
     def to_s
       values.sort.map { |k, v| "#{k}=#{ Utils.escape(v) }" }.join('&')
     end
   end
 
   # Calculates an MD5sum for file being uploaded.
-  Content = Struct.new(:body) do
+  class Content
+    attr :body
+
+    def initialize(body)
+      @body = body
+    end
+
     def md5
       Base64.encode64(OpenSSL::Digest::MD5.digest(body)).strip
     end
   end
 
   # Signs an AWS request.
-  Request = Struct.new(:method, :host, :path, :query_string) do
     def sign(aws_secret_access_key)
+  class Request
+    attr :method, :host, :path, :query_string
+
+    def initialize(method, host, path, query_string)
+      @method = method
+      @host = host
+      @path = path
+      @query_string = query_string
+    end
+
       Signature.new(aws_secret_access_key).sign(string_to_sign)
     end
 
