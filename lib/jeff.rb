@@ -121,13 +121,28 @@ module Jeff
   # Accessors for required AWS attributes.
   attr_accessor :aws_endpoint, :aws_access_key_id, :aws_secret_access_key
 
-  # We'll keep these around so we don't break dependent libraries.
-  alias endpoint aws_endpoint
-  alias endpoint= aws_endpoint=
-  alias key aws_access_key_id
-  alias key= aws_access_key_id=
-  alias secret aws_secret_access_key
-  alias secret= aws_secret_access_key=
+  # Keep these deprecated attribute accessors around for a while.
+  # TODO Remove when cutting v1.0.
+  %w(
+    endpoint aws_endpoint
+    endpoint= aws_endpoint=
+    key aws_access_key_id
+    key= aws_access_key_id=
+    secret aws_secret_access_key
+    secret= aws_secret_access_key=
+  ).each_slice(2) do |old, new|
+    if old.end_with?('=')
+      define_method(old) do |value|
+        warn "[DEPRECATION] Use #{new}"
+        self.send(new, value)
+      end
+    else
+      define_method(old) do
+        warn "[DEPRECATION] Use #{new}"
+        self.send(new)
+      end
+    end
+  end
 
   # Generate HTTP request verb methods.
   Excon::HTTP_VERBS.each do |method|
