@@ -35,7 +35,7 @@ describe Jeff do
 
   it 'sets a User-Agent header for the client connection' do
     client = @klass.new
-    client.endpoint = 'http://example.com/'
+    client.aws_endpoint = 'http://example.com/'
     client.connection.data[:headers]['User-Agent'].wont_be_nil
   end
 
@@ -43,9 +43,9 @@ describe Jeff do
     it "makes a #{method.upcase} request" do
       Excon.stub({ }, { status: 200 })
       client = @klass.new
-      client.endpoint = 'http://example.com/'
-      client.key = 'foo'
-      client.secret = 'bar'
+      client.aws_endpoint = 'http://example.com/'
+      client.aws_access_key_id = 'foo'
+      client.aws_secret_access_key = 'bar'
       client.send(method).status.must_equal 200
       Excon.stubs.clear
     end
@@ -56,9 +56,9 @@ describe Jeff do
       { body: params[:headers]['Content-MD5'] }
     end
     client = @klass.new
-    client.endpoint = 'http://example.com/'
-    client.key = 'foo'
-    client.secret = 'bar'
+    client.aws_endpoint = 'http://example.com/'
+    client.aws_access_key_id = 'foo'
+    client.aws_secret_access_key = 'bar'
     client.post(body: 'foo').body.wont_be_empty
     Excon.stubs.clear
   end
