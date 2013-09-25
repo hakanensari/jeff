@@ -1,5 +1,4 @@
-# Our only external dependency. Excon is currently my preferred HTTP client in
-# Ruby.
+# The only external dependency.
 require 'excon'
 
 # Standard library dependencies.
@@ -41,7 +40,6 @@ module Jeff
   end
 
   # Signs an AWS request.
-    def sign(aws_secret_access_key)
   class Request
     attr :method, :host, :path, :query_string
 
@@ -52,6 +50,7 @@ module Jeff
       @query_string = query_string
     end
 
+    def sign_with(aws_secret_access_key)
       Signature.new(aws_secret_access_key).sign(string_to_sign)
     end
 
@@ -73,7 +72,7 @@ module Jeff
     end
 
     def secret
-      @secret or raise ArgumentError, 'Missing secret'
+      @secret or raise ArgumentError.new('Missing secret')
     end
   end
 
@@ -110,10 +109,9 @@ module Jeff
     )
   end
 
-  # An HTTP connection. It's reusable, which, as the author of Excon puts it,
-  # is more performant!
+  # A reusable HTTP connection.
   def connection
-    @connection ||= Excon.new(endpoint,
+    @connection ||= Excon.new(aws_endpoint,
       headers: { 'User-Agent' => USER_AGENT },
       expects: 200,
       omit_default_port: true
@@ -166,10 +164,10 @@ module Jeff
         options[:path] || connection.data[:path],
         query_string
       )
-      .sign(aws_secret_access_key)
+      .sign_with(aws_secret_access_key)
 
     # Return options after appending an escaped signature to query.
-    options.update(query: "#{query_string}&Signature=#{Utils.escape(signature)}")
+    options.merge(query: "#{query_string}&Signature=#{Utils.escape(signature)}")
   end
 
   module ClassMethods
