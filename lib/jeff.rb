@@ -40,11 +40,11 @@ module Jeff
   end
 
   # Signs an AWS request.
-  class Request
+  class Signer
     attr :method, :host, :path, :query_string
 
     def initialize(method, host, path, query_string)
-      @method = method
+      @method = method.upcase
       @host = host
       @path = path
       @query_string = query_string
@@ -172,13 +172,8 @@ module Jeff
     query_string = Query.new(values).to_s
 
     # Generate a signature.
-    signature = Request
-      .new(
-        options[:method].upcase,
-        connection.data[:host],
-        options[:path] || connection.data[:path],
-        query_string
-      )
+    signature = Signer
+      .new(options[:method], connection.data[:host], options[:path] || connection.data[:path], query_string)
       .sign_with(aws_secret_access_key)
 
     # Return options after appending an escaped signature to query.
