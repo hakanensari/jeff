@@ -1,19 +1,25 @@
 # Jeff
 
-Jeff mixes in client behaviour for Amazon Web Services (AWS) which require
+Jeff mixes in client behaviour for Amazon Web Services (AWS) that require
 [Signature version 2 authentication][sig].
 
-Monsieur Jeff couples with [Excon][exc].
+Jeff builds on [Excon][exc].
 
 ![jeff][jef]
 
 ## Usage
 
-A somewhat contrived example:
+A minimal example:
 
 ```ruby
-Service = Struct.new(:aws_access_key_id, :aws_secret_access_key) do
+ProductsService = Struct.new(:aws_access_key_id, :aws_secret_access_key) do
   include Jeff
+
+  PARSER = /Status>([^<]+)/
+
+  def self.status
+    new('foo', 'bar').status
+  end
 
   def aws_endpoint
     'https://mws.amazonservices.com/Products/2011-10-01'
@@ -22,13 +28,13 @@ Service = Struct.new(:aws_access_key_id, :aws_secret_access_key) do
   def status
     get(query: { 'Action' => 'GetServiceStatus' })
       .body
-      .match(/Status>([^<]+)/)
+      .match(PARSER)
       .[](1)
   end
 end
 
-srv = Service.new('key', 'secret')
-srv.status # => "GREEN"
+ProductsService.status
+# => "GREEN"
 ```
 
 [Vacuum][vac] and [Peddler][ped] implement Jeff.

@@ -1,4 +1,4 @@
-# The only external dependency.
+# Jeff's only external dependency.
 require 'excon'
 
 # Standard library dependencies.
@@ -74,7 +74,7 @@ module Jeff
     end
   end
 
-  # Because Ruby's CGI escapes ~, we have to resort to writing our own escape.
+  # Because Ruby's CGI escapes tilde, use a custom escape.
   module Utils
     UNRESERVED = /([^\w.~-]+)/
 
@@ -85,11 +85,9 @@ module Jeff
     end
   end
 
-  # Amazon recommends to include a User-Agent header with every request to 
+  # Amazon recommends to include a User-Agent header with every request to
   # identify the application, its version number, programming language, and
   # host.
-  #
-  # If not happy, override.
   USER_AGENT = "Jeff/#{VERSION} (Language=Ruby; #{`hostname`.chomp})"
 
   def self.included(base)
@@ -141,13 +139,13 @@ module Jeff
   private
 
   def build_options(options)
-    # Add a Content-MD5 header if we're uploading a file.
+    # Add a Content-MD5 header if uploading a file.
     if options.has_key?(:body)
       md5 = Content.new(options[:body]).md5
       (options[:headers] ||= {}).store('Content-MD5', md5)
     end
 
-    # Build the query string.
+    # Build a query string.
     values = self.class.params
       .reduce({}) { |a, (k, v)|
         a.update(k => (v.respond_to?(:call) ? instance_exec(&v) : v))
@@ -155,7 +153,7 @@ module Jeff
       .merge(options.fetch(:query, {}))
     query_string = Query.new(values).to_s
 
-    # Generate a signature.
+    # Generate signature.
     signature = Signer
       .new(options[:method], connection.data[:host], options[:path] || connection.data[:path], query_string)
       .sign_with(aws_secret_access_key)
@@ -165,7 +163,7 @@ module Jeff
   end
 
   module ClassMethods
-    # Gets and optionally updates the default request parameters.
+    # Gets/updates the default request parameters.
     def params(hsh = {})
       (@params ||= {}).update(hsh)
     end
