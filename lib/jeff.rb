@@ -139,19 +139,15 @@ module Jeff
   private
 
   def build_options(options)
-    # Add a Content-MD5 header if uploading a file.
+    # Add Content-MD5 header if uploading a file.
     if options.has_key?(:body)
       md5 = Content.new(options[:body]).md5
       (options[:headers] ||= {}).store('Content-MD5', md5)
     end
 
-    # Build a query string.
-    values = self.class.params
-      .reduce({}) { |a, (k, v)|
-        a.update(k => (v.respond_to?(:call) ? instance_exec(&v) : v))
-      }
-      .merge(options.fetch(:query, {}))
-    query_string = Query.new(values).to_s
+    # Build query string.
+    query_values = default_query_values.merge(options.fetch(:query, {}))
+    query_string = Query.new(query_values).to_s
 
     # Generate signature.
     signature = Signer
@@ -162,8 +158,14 @@ module Jeff
     options.merge(query: "#{query_string}&Signature=#{Utils.escape(signature)}")
   end
 
+  def default_query_values
+    self.class.params.reduce({}) { |a, (k, v)|
+      a.update(k => (v.respond_to?(:call) ? instance_exec(&v) : v))
+    }
+  end
+
   module ClassMethods
-    # Gets/updates the default request parameters.
+    # Gets/updates default request parameters.
     def params(hsh = {})
       (@params ||= {}).update(hsh)
     end
