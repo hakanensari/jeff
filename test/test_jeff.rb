@@ -9,6 +9,17 @@ class TestJeff < Minitest::Test
     @klass = Class.new { include Jeff }
   end
 
+  def test_delegates_unset_aws_credential_to_env_vars
+    key = '123456'
+    client = @klass.new
+    %w(aws_access_key_id aws_secret_access_key).each do |attr|
+      ENV[attr.upcase] = key
+      assert_equal key, client.send(attr)
+      ENV[attr.upcase] = nil
+      refute_equal key, client.send(attr)
+    end
+  end
+
   def test_has_required_request_query_parameters
     %w(AWSAccessKeyId SignatureMethod SignatureVersion Timestamp).each do |key|
       assert @klass.params.has_key?(key)

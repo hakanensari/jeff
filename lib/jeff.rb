@@ -118,8 +118,16 @@ module Jeff
     )
   end
 
-  # Accessors for required AWS attributes.
-  attr_accessor :aws_endpoint, :aws_access_key_id, :aws_secret_access_key
+  attr_accessor :aws_endpoint
+
+  attr_writer :aws_access_key_id, :aws_secret_access_key
+
+  def aws_access_key_id
+    @aws_access_key_id || ENV['AWS_ACCESS_KEY_ID']
+  end
+
+  def aws_secret_access_key
+    @aws_secret_access_key || ENV['AWS_SECRET_ACCESS_KEY']
   end
 
   # Generate HTTP request verb methods.
