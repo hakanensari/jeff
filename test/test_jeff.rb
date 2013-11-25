@@ -4,54 +4,53 @@ require 'jeff'
 
 Excon.defaults[:mock] = true
 
-describe Jeff do
-  before do
-    @klass = Class.new do
-      include Jeff
+class TestJeff < Minitest::Test
+  def setup
+    @klass = Class.new { include Jeff }
+  end
+
+  def test_has_required_request_query_parameters
+    %w(AWSAccessKeyId SignatureMethod SignatureVersion Timestamp).each do |key|
+      assert @klass.params.has_key?(key)
     end
   end
 
-  it 'has the required request query parameters' do
-    %w(AWSAccessKeyId SignatureMethod SignatureVersion Timestamp)
-      .each { |key| assert @klass.params.has_key?(key) }
-  end
-
-  it 'configures the request query parameters' do
+  def test_configures_request_query_parameters
     @klass.instance_eval do
       params 'Foo' => 'bar'
     end
     assert @klass.params.has_key?('Foo')
   end
 
-  it 'requires a signature' do
-    sig = Jeff::Signature.new(nil)
-    proc { sig.sign('foo') }.must_raise ArgumentError
+  def test_requires_signature
+    signature = Jeff::Signature.new(nil)
+    assert_raises(ArgumentError) { signature.sign('foo') }
   end
 
-  it 'sorts the request query parameters of the client lexicographically' do
+  def test_sorts_request_query_parameters_lexicographically
     query = Jeff::Query.new('A10' => 1, 'A1' => 1)
-    query.to_s.must_equal('A1=1&A10=1')
+    assert_equal 'A1=1&A10=1', query.to_s
   end
 
-  it 'sets a User-Agent header for the client connection' do
+  def test_sets_user_agent_header
     client = @klass.new
     client.aws_endpoint = 'http://example.com/'
-    client.connection.data[:headers]['User-Agent'].wont_be_nil
+    refute_nil client.connection.data[:headers]['User-Agent']
   end
 
   Excon::HTTP_VERBS.each do |method|
-    it "makes a #{method.upcase} request" do
+    define_method "test_makes_#{method}_request" do
       Excon.stub({ }, { status: 200 })
       client = @klass.new
       client.aws_endpoint = 'http://example.com/'
       client.aws_access_key_id = 'foo'
       client.aws_secret_access_key = 'bar'
-      client.send(method).status.must_equal 200
+      assert_equal 200, client.send(method).status
       Excon.stubs.clear
     end
   end
 
-  it 'adds a Content-MD5 request header if there is a request body' do
+  def test_adds_contet_md5_request_header_if_given_a_request_body
     Excon.stub({ }) do |params|
       { body: params[:headers]['Content-MD5'] }
     end
@@ -59,7 +58,7 @@ describe Jeff do
     client.aws_endpoint = 'http://example.com/'
     client.aws_access_key_id = 'foo'
     client.aws_secret_access_key = 'bar'
-    client.post(body: 'foo').body.wont_be_empty
+    refute_empty client.post(body: 'foo').body
     Excon.stubs.clear
   end
 end
