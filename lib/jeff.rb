@@ -11,7 +11,7 @@ require 'jeff/version'
 # Jeff mixes in client behaviour for Amazon Web Services (AWS) that require
 # Signature version 2 authentication.
 module Jeff
-  # Converts a query value to a sorted query string.
+  # Converts query field-value pairs to a sorted query string.
   class Query
     attr :values
 
