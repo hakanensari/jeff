@@ -49,6 +49,10 @@ class TestJeff < Minitest::Test
     refute_nil client.connection.data[:headers]['User-Agent']
   end
 
+  def test_does_not_escape_tilde
+    assert_equal '~%2C', Jeff::Utils.escape('~,')
+  end
+
   Excon::HTTP_VERBS.each do |method|
     define_method "test_makes_#{method}_request" do
       Excon.stub({ }, { status: 200 })
