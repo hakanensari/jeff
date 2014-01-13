@@ -1,6 +1,6 @@
 require 'minitest/autorun'
 require 'minitest/pride'
-require 'jeff'
+require_relative '../lib/jeff'
 
 Excon.defaults[:mock] = true
 
@@ -61,7 +61,7 @@ class TestJeff < Minitest::Test
     end
   end
 
-  def test_adds_contet_md5_request_header_if_given_a_request_body
+  def test_adds_content_md5_request_header_if_given_a_request_body
     Excon.stub({ }) do |params|
       { body: params[:headers]['Content-MD5'] }
     end
