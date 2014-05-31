@@ -7,7 +7,7 @@ Gem::Specification.new do |gem|
   gem.email         = ['hakan.ensari@papercavalier.com']
   gem.description   = %q{An Amazon Web Services client}
   gem.summary       = %q{An AWS client}
-  gem.homepage      = 'https://github.com/papercavalier/jeff'
+  gem.homepage      = 'https://github.com/hakanensari/jeff'
 
   gem.files         = `git ls-files`.split($\)
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
