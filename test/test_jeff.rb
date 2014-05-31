@@ -2,8 +2,6 @@ require 'minitest/autorun'
 require 'minitest/pride'
 require_relative '../lib/jeff'
 
-Excon.defaults[:mock] = true
-
 class TestJeff < Minitest::Test
   def setup
     @klass = Class.new { include Jeff }
@@ -60,7 +58,7 @@ class TestJeff < Minitest::Test
       client.aws_endpoint = 'http://example.com/'
       client.aws_access_key_id = 'foo'
       client.aws_secret_access_key = 'bar'
-      assert_equal 200, client.send(method).status
+      assert_equal 200, client.send(method, mock: true).status
       Excon.stubs.clear
     end
   end
@@ -73,7 +71,7 @@ class TestJeff < Minitest::Test
     client.aws_endpoint = 'http://example.com/'
     client.aws_access_key_id = 'foo'
     client.aws_secret_access_key = 'bar'
-    refute_empty client.post(body: 'foo').body
+    refute_empty client.post(body: 'foo', mock: true).body
     Excon.stubs.clear
   end
 end
