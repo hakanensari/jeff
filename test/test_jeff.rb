@@ -74,4 +74,13 @@ class TestJeff < Minitest::Test
     refute_empty client.post(body: 'foo', mock: true).body
     Excon.stubs.clear
   end
+
+  def test_integration
+    client = @klass.new
+    client.aws_access_key_id = 'foo'
+    client.aws_secret_access_key = 'bar'
+    client.aws_endpoint = 'https://mws.amazonservices.com/Sellers/2011-07-01'
+    res = client.post(query: { 'Action' => 'GetServiceStatus'})
+    assert_equal 200, res.status
+  end
 end
