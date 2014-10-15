@@ -47,6 +47,13 @@ class TestJeff < Minitest::Test
     refute_nil client.connection.data[:headers]['User-Agent']
   end
 
+  def test_allows_customizing_user_agent
+    @klass.user_agent = "CustomApp/1.0"
+    client = @klass.new
+    client.aws_endpoint = 'http://example.com/'
+    assert_equal "CustomApp/1.0", client.connection.data[:headers]['User-Agent']
+  end
+
   def test_does_not_escape_tilde
     assert_equal '~%2C', Jeff::Utils.escape('~,')
   end
