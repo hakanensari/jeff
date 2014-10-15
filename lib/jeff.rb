@@ -85,11 +85,6 @@ module Jeff
     end
   end
 
-  # Amazon recommends to include a User-Agent header with every request to
-  # identify the application, its version number, programming language, and
-  # host.
-  USER_AGENT = "Jeff/#{VERSION} (Language=Ruby; #{`hostname`.chomp})"
-
   def self.included(base)
     base.extend(ClassMethods)
 
@@ -108,7 +103,7 @@ module Jeff
   # A reusable HTTP connection.
   def connection
     @connection ||= Excon.new(aws_endpoint,
-      headers: { 'User-Agent' => USER_AGENT },
+      headers: { 'User-Agent' => self.class.user_agent },
       expects: 200,
       omit_default_port: true
     )
@@ -168,6 +163,17 @@ module Jeff
     # Gets/updates default request parameters.
     def params(hsh = {})
       (@params ||= {}).update(hsh)
+    end
+
+    # Amazon recommends to include a User-Agent header with every request to
+    # identify the application, its version number, programming language, and
+    # host.
+    def user_agent
+      @user_agent ||= "Jeff/#{VERSION} (Language=Ruby; #{`hostname`.chomp})"
+    end
+
+    def user_agent=(user_agent)
+      @user_agent = user_agent
     end
   end
 end
