@@ -44,7 +44,7 @@ class TestJeff < Minitest::Test
   def test_sets_user_agent_header
     client = @klass.new
     client.aws_endpoint = 'http://example.com/'
-    refute_nil client.connection.data[:headers]['User-Agent']
+    assert_includes client.connection.data[:headers]['User-Agent'], 'Jeff'
   end
 
   def test_allows_customizing_user_agent

@@ -165,15 +165,22 @@ module Jeff
       (@params ||= {}).update(hsh)
     end
 
-    # Amazon recommends to include a User-Agent header with every request to
-    # identify the application, its version number, programming language, and
-    # host.
     def user_agent
-      @user_agent ||= "Jeff/#{VERSION} (Language=Ruby; #{`hostname`.chomp})"
+      @user_agent ||= default_user_agent
+
     end
 
     def user_agent=(user_agent)
       @user_agent = user_agent
+    end
+
+    private
+
+    # Amazon recommends to include a User-Agent header with every request to
+    # identify the application, its version number, programming language, and
+    # host.
+    def default_user_agent
+      "Jeff/#{VERSION} (Language=Ruby; #{`hostname`.chomp})"
     end
   end
 end
