@@ -1,4 +1,4 @@
-# Jeff"s only external dependency.
+# Jeff's only external dependency.
 require "excon"
 
 # Standard library dependencies.
@@ -74,7 +74,7 @@ module Jeff
     end
   end
 
-  # Because Ruby"s CGI escapes tilde, use a custom escape.
+  # Because Ruby's CGI escapes tilde, use a custom escape.
   module Utils
     UNRESERVED = /([^\w.~-]+)/
 
