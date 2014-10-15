@@ -1,12 +1,12 @@
-# Jeff's only external dependency.
-require 'excon'
+# Jeff"s only external dependency.
+require "excon"
 
 # Standard library dependencies.
-require 'base64'
-require 'openssl'
-require 'time'
+require "base64"
+require "openssl"
+require "time"
 
-require 'jeff/version'
+require "jeff/version"
 
 # Jeff mixes in client behaviour for Amazon Web Services (AWS) that require
 # Signature version 2 authentication.
@@ -20,7 +20,7 @@ module Jeff
     end
 
     def to_s
-      values.sort.map { |k, v| "#{k}=#{ Utils.escape(v) }" }.join('&')
+      values.sort.map { |k, v| "#{k}=#{ Utils.escape(v) }" }.join("&")
     end
   end
 
@@ -70,17 +70,17 @@ module Jeff
     end
 
     def secret
-      @secret or raise ArgumentError.new('Missing secret')
+      @secret or raise ArgumentError.new("Missing secret")
     end
   end
 
-  # Because Ruby's CGI escapes tilde, use a custom escape.
+  # Because Ruby"s CGI escapes tilde, use a custom escape.
   module Utils
     UNRESERVED = /([^\w.~-]+)/
 
     def self.escape(val)
       val.to_s.gsub(UNRESERVED) do
-        '%' + $1.unpack('H2' * $1.bytesize).join('%').upcase
+        "%" + $1.unpack("H2" * $1.bytesize).join("%").upcase
       end
     end
   end
@@ -93,17 +93,17 @@ module Jeff
     # Add other common parameters using `Jeff.params` if required in your
     # implementation.
     base.params(
-      'AWSAccessKeyId'   => -> { aws_access_key_id },
-      'SignatureVersion' => '2',
-      'SignatureMethod'  => 'HmacSHA256',
-      'Timestamp'        => -> { Time.now.utc.iso8601 }
+      "AWSAccessKeyId"   => -> { aws_access_key_id },
+      "SignatureVersion" => "2",
+      "SignatureMethod"  => "HmacSHA256",
+      "Timestamp"        => -> { Time.now.utc.iso8601 }
     )
   end
 
   # A reusable HTTP connection.
   def connection
     @connection ||= Excon.new(aws_endpoint,
-      headers: { 'User-Agent' => self.class.user_agent },
+      headers: { "User-Agent" => self.class.user_agent },
       expects: 200,
       omit_default_port: true
     )
@@ -114,11 +114,11 @@ module Jeff
   attr_writer :aws_access_key_id, :aws_secret_access_key
 
   def aws_access_key_id
-    @aws_access_key_id || ENV['AWS_ACCESS_KEY_ID']
+    @aws_access_key_id || ENV["AWS_ACCESS_KEY_ID"]
   end
 
   def aws_secret_access_key
-    @aws_secret_access_key || ENV['AWS_SECRET_ACCESS_KEY']
+    @aws_secret_access_key || ENV["AWS_SECRET_ACCESS_KEY"]
   end
 
   # Generate HTTP request verb methods.
@@ -137,7 +137,7 @@ module Jeff
     # Add Content-MD5 header if uploading a file.
     if options.has_key?(:body)
       md5 = Content.new(options[:body]).md5
-      (options[:headers] ||= {}).store('Content-MD5', md5)
+      (options[:headers] ||= {}).store("Content-MD5", md5)
     end
 
     # Build query string.
