@@ -154,9 +154,13 @@ module Jeff
   end
 
   def default_query_values
-    self.class.params.reduce({}) { |a, (k, v)|
-      a.update(k => (v.respond_to?(:call) ? instance_exec(&v) : v))
-    }
+    self.class.params
+      .reduce({}) { |qv, (k, v)|
+        v = v.respond_to?(:call) ? instance_exec(&v) : v
+
+        # Ignore keys with nil values
+        v.nil? ? qv : qv.update(k => v)
+      }
   end
 
   module ClassMethods
