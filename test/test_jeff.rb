@@ -25,10 +25,15 @@ class TestJeff < Minitest::Test
   end
 
   def test_configures_request_query_parameters
-    @klass.instance_eval do
-      params "Foo" => "bar"
-    end
+    @klass.params "Foo" => "bar"
     assert @klass.params.has_key?("Foo")
+  end
+
+  def test_allows_dynamic_values_for_request_query_parameters
+    @klass.params "Foo" => -> { bar }
+    client = @klass.new
+    def client.bar; "baz"; end
+    assert client.bar, client.send(:default_query_values).fetch("Foo")
   end
 
   def test_requires_signature
