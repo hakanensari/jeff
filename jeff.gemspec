@@ -8,6 +8,7 @@ Gem::Specification.new do |gem|
   gem.description   = %q{An Amazon Web Services client}
   gem.summary       = %q{An AWS client}
   gem.homepage      = "https://github.com/hakanensari/jeff"
+  gem.license       = "MIT"
 
   gem.files         = `git ls-files`.split($\)
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
