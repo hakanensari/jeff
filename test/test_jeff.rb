@@ -34,6 +34,7 @@ class TestJeff < Minitest::Test
     client = @klass.new
     def client.bar; "baz"; end
     assert client.bar, client.send(:default_query_values).fetch("Foo")
+    assert_kind_of Proc, @klass.params["Foo"]
   end
 
   def test_discards_request_query_parameters_with_nil_values
@@ -41,7 +42,6 @@ class TestJeff < Minitest::Test
     client = @klass.new
     def client.bar; end
     refute client.send(:default_query_values).key?("Foo")
-    assert_kind_of Proc, @klass.params["Foo"]
   end
 
   def test_requires_signature
