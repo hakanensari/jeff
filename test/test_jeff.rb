@@ -70,37 +70,39 @@ class TestJeff < Minitest::Test
   def test_does_not_escape_tilde
     assert_equal "~%2C", Jeff::Utils.escape("~,")
   end
+end
+
+class TestJeffInAction < Minitest::Test
+  def setup
+    klass = Class.new { include Jeff }
+    @client = klass.new
+    @client.aws_endpoint = "http://example.com/"
+    @client.aws_access_key_id = "foo"
+    @client.aws_secret_access_key = "bar"
+  end
+
+  def teardown
+    Excon.stubs.clear
+  end
 
   Excon::HTTP_VERBS.each do |method|
     define_method "test_makes_#{method}_request" do
-      Excon.stub({ }, { status: 200 })
-      client = @klass.new
-      client.aws_endpoint = "http://example.com/"
-      client.aws_access_key_id = "foo"
-      client.aws_secret_access_key = "bar"
-      assert_equal 200, client.send(method, mock: true).status
-      Excon.stubs.clear
+      Excon.stub({}, { status: 200 })
+      assert_equal 200, @client.send(method, mock: true).status
     end
   end
 
   def test_adds_content_md5_request_header_if_given_a_request_body
-    Excon.stub({ }) do |params|
-      { body: params[:headers]["Content-MD5"] }
+    Excon.stub({}) do |request_params|
+      { body: request_params[:headers]["Content-MD5"] }
     end
-    client = @klass.new
-    client.aws_endpoint = "http://example.com/"
-    client.aws_access_key_id = "foo"
-    client.aws_secret_access_key = "bar"
-    refute_empty client.post(body: "foo", mock: true).body
-    Excon.stubs.clear
+    refute_empty @client.post(body: "foo", mock: true).body
+  end
   end
 
-  def test_integration
-    client = @klass.new
-    client.aws_access_key_id = "foo"
-    client.aws_secret_access_key = "bar"
-    client.aws_endpoint = "https://mws.amazonservices.com/Sellers/2011-07-01"
-    res = client.post(query: { "Action" => "GetServiceStatus"})
+  def test_gets_from_an_actual_endpoint
+    @client.aws_endpoint = "https://mws.amazonservices.com/Sellers/2011-07-01"
+    res = @client.post(query: { "Action" => "GetServiceStatus"})
     assert_equal 200, res.status
   end
 end
