@@ -20,7 +20,9 @@ module Jeff
     end
 
     def to_s
-      values.sort.map { |k, v| "#{k}=#{ Utils.escape(v) }" }.join("&")
+      values
+        .sort { |a, b| a[0].to_s <=> b[0].to_s }
+        .map { |k, v| "#{k}=#{ Utils.escape(v) }" }.join("&")
     end
   end
 

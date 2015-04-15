@@ -54,6 +54,11 @@ class TestJeff < Minitest::Test
     assert_equal "A1=1&A10=1", query.to_s
   end
 
+  def test_handles_symbol_keys
+    query = Jeff::Query.new(foo: 1, bar: 2)
+    assert_equal "bar=2&foo=1", query.to_s
+  end
+
   def test_sets_user_agent_header
     client = @klass.new
     client.aws_endpoint = "http://example.com/"
