@@ -103,6 +103,22 @@ class TestJeffInAction < Minitest::Test
     end
     refute_empty @client.post(body: "foo", mock: true).body
   end
+
+  def test_moves_query_to_body_if_uri_is_too_long
+    Excon.stub({}) do |request_params|
+      { status: request_params[:query] ? 414 : 200 }
+    end
+
+    res = @client.post(query: { foo: "bar" }, mock: true)
+    assert_equal 200, res.status
+
+    assert_raises(Excon::Errors::RequestURITooLong) do
+      @client.post(query: { foo: "bar" }, body: "baz", mock: true)
+    end
+
+    assert_raises(Excon::Errors::RequestURITooLong) do
+      @client.get(query: { foo: "bar" }, mock: true)
+    end
   end
 
   def test_gets_from_an_actual_endpoint

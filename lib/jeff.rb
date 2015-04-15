@@ -128,20 +128,29 @@ module Jeff
     eval <<-DEF
       def #{method}(options = {})
         options.store(:method, :#{method})
-        connection.request(build_options(options))
+        add_md5_digest options
+        sign options
+
+        begin
+          connection.request(options)
+        rescue Excon::Errors::RequestURITooLong
+          raise if options[:body] || options[:method] != :post
+          move_query_to_body options
+          retry
+        end
       end
     DEF
   end
 
   private
 
-  def build_options(options)
-    # Add Content-MD5 header if uploading a file.
-    if options.has_key?(:body)
-      md5 = Content.new(options[:body]).md5
-      (options[:headers] ||= {}).store("Content-MD5", md5)
-    end
+  def add_md5_digest(options)
+    return unless options.has_key?(:body)
+    md5 = Content.new(options[:body]).md5
+    (options[:headers] ||= {}).store("Content-MD5", md5)
+  end
 
+  def sign(options)
     # Build query string.
     query_values = default_query_values.merge(options.fetch(:query, {}))
     query_string = Query.new(query_values).to_s
@@ -151,8 +160,13 @@ module Jeff
       .new(options[:method], connection.data[:host], options[:path] || connection.data[:path], query_string)
       .sign_with(aws_secret_access_key)
 
-    # Return options after appending an escaped signature to query.
-    options.merge(query: "#{query_string}&Signature=#{Utils.escape(signature)}")
+    # Append escaped signature to query.
+    options.store(:query, "#{query_string}&Signature=#{Utils.escape(signature)}")
+  end
+
+  def move_query_to_body(options)
+    (options[:headers] ||= {}).store("Content-Type", "application/x-www-form-urlencoded")
+    options.store(:body, options.delete(:query))
   end
 
   def default_query_values
