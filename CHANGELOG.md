@@ -1,6 +1,7 @@
 # 1.3.0 15/4/2015
 
 - Handle overly long request queries
+  See https://github.com/hakanensari/peddler/issues/36
 
 # 1.2.0 23/1/2015
 
