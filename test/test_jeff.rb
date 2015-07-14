@@ -20,13 +20,13 @@ class TestJeff < Minitest::Test
 
   def test_has_required_request_query_parameters
     %w(AWSAccessKeyId SignatureMethod SignatureVersion Timestamp).each do |key|
-      assert @klass.params.has_key?(key)
+      assert @klass.params.key?(key)
     end
   end
 
   def test_configures_request_query_parameters
     @klass.params "Foo" => "bar"
-    assert @klass.params.has_key?("Foo")
+    assert @klass.params.key?("Foo")
   end
 
   def test_allows_dynamic_values_for_request_query_parameters
@@ -92,7 +92,7 @@ class TestJeffInAction < Minitest::Test
 
   Excon::HTTP_VERBS.each do |method|
     define_method "test_makes_#{method}_request" do
-      Excon.stub({}, { status: 200 })
+      Excon.stub({}, status: 200)
       assert_equal 200, @client.send(method, mock: true).status
     end
   end
@@ -123,7 +123,7 @@ class TestJeffInAction < Minitest::Test
 
   def test_gets_from_an_actual_endpoint
     @client.aws_endpoint = "https://mws.amazonservices.com/Sellers/2011-07-01"
-    res = @client.post(query: { "Action" => "GetServiceStatus"})
+    res = @client.post(query: { "Action" => "GetServiceStatus" })
     assert_equal 200, res.status
   end
 end

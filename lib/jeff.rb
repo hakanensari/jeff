@@ -13,7 +13,7 @@ require "jeff/version"
 module Jeff
   # Converts query field-value pairs to a sorted query string.
   class Query
-    attr :values
+    attr_reader :values
 
     def initialize(values)
       @values = values
@@ -22,13 +22,13 @@ module Jeff
     def to_s
       values
         .sort { |a, b| a[0].to_s <=> b[0].to_s }
-        .map { |k, v| "#{k}=#{ Utils.escape(v) }" }.join("&")
+        .map { |k, v| "#{k}=#{Utils.escape(v)}" }.join("&")
     end
   end
 
   # Calculates an MD5sum for file being uploaded.
   class Content
-    attr :body
+    attr_reader :body
 
     def initialize(body)
       @body = body
@@ -41,7 +41,7 @@ module Jeff
 
   # Signs an AWS request.
   class Signer
-    attr :method, :host, :path, :query_string
+    attr_reader :method, :host, :path, :query_string
 
     def initialize(method, host, path, query_string)
       @method = method.upcase
@@ -72,7 +72,7 @@ module Jeff
     end
 
     def secret
-      @secret or raise ArgumentError.new("Missing secret")
+      @secret || fail(ArgumentError, "Missing secret")
     end
   end
 
@@ -82,7 +82,8 @@ module Jeff
 
     def self.escape(val)
       val.to_s.gsub(UNRESERVED) do
-        "%" + $1.unpack("H2" * $1.bytesize).join("%").upcase
+        match = Regexp.last_match[1]
+        "%" + match.unpack("H2" * match.bytesize).join("%").upcase
       end
     end
   end
@@ -145,7 +146,7 @@ module Jeff
   private
 
   def add_md5_digest(options)
-    return unless options.has_key?(:body)
+    return unless options.key?(:body)
     md5 = Content.new(options[:body]).md5
     (options[:headers] ||= {}).store("Content-MD5", md5)
   end
@@ -165,18 +166,19 @@ module Jeff
   end
 
   def move_query_to_body(options)
-    (options[:headers] ||= {}).store("Content-Type", "application/x-www-form-urlencoded")
+    options[:headers] ||= {}
+    options[:headers].store("Content-Type", "application/x-www-form-urlencoded")
     options.store(:body, options.delete(:query))
   end
 
   def default_query_values
     self.class.params
-      .reduce({}) { |qv, (k, v)|
+      .reduce({}) do |qv, (k, v)|
         v = v.respond_to?(:call) ? instance_exec(&v) : v
 
         # Ignore keys with nil values
         v.nil? ? qv : qv.update(k => v)
-      }
+      end
   end
 
   module ClassMethods
@@ -187,12 +189,9 @@ module Jeff
 
     def user_agent
       @user_agent ||= default_user_agent
-
     end
 
-    def user_agent=(user_agent)
-      @user_agent = user_agent
-    end
+    attr_writer :user_agent
 
     private
 
