@@ -105,11 +105,11 @@ module Jeff
 
   # A reusable HTTP connection.
   def connection
-    @connection ||= Excon.new(aws_endpoint,
-      headers: { "User-Agent" => self.class.user_agent },
-      expects: 200,
-      omit_default_port: true
-    )
+    @connection ||= Excon.new(aws_endpoint, connection_params)
+  end
+
+  def connection_params
+    @connection_params ||= default_connection_params
   end
 
   attr_accessor :aws_endpoint
@@ -144,6 +144,14 @@ module Jeff
   end
 
   private
+
+  def default_connection_params
+    {
+      headers: { "User-Agent" => self.class.user_agent },
+      expects: 200,
+      omit_default_port: true
+    }
+  end
 
   def add_md5_digest(options)
     return unless options.key?(:body)

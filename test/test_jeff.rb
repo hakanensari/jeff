@@ -126,4 +126,13 @@ class TestJeffInAction < Minitest::Test
     res = @client.post(query: { "Action" => "GetServiceStatus" })
     assert_equal 200, res.status
   end
+
+  def test_has_no_proxy_by_default
+    refute @client.connection.proxy
+  end
+
+  def test_sets_proxy
+    @client.connection_params.store(:proxy, "http://my.proxy:4321")
+    assert @client.connection.proxy
+  end
 end
