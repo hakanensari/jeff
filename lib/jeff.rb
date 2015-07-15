@@ -124,6 +124,10 @@ module Jeff
     @aws_secret_access_key || ENV["AWS_SECRET_ACCESS_KEY"]
   end
 
+  def proxy=(url)
+    connection_params.store(:proxy, url)
+  end
+
   # Generate HTTP request verb methods.
   Excon::HTTP_VERBS.each do |method|
     eval <<-DEF

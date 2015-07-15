@@ -132,7 +132,7 @@ class TestJeffInAction < Minitest::Test
   end
 
   def test_sets_proxy
-    @client.connection_params.store(:proxy, "http://my.proxy:4321")
+    @client.proxy = "http://my.proxy:4321"
     assert @client.connection.proxy
   end
 end
