@@ -135,14 +135,10 @@ module Jeff
         options.store(:method, :#{method})
         add_md5_digest options
         sign options
-
-        begin
-          connection.request(options)
-        rescue Excon::Errors::RequestURITooLong
-          raise if options[:body] || options[:method] != :post
+        if !options[:body] and options[:method] == :post
           move_query_to_body options
-          retry
         end
+        connection.request(options)
       end
     DEF
   end
