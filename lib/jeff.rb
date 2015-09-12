@@ -135,9 +135,7 @@ module Jeff
         options.store(:method, :#{method})
         add_md5_digest options
         sign options
-        if !options[:body] and options[:method] == :post
-          move_query_to_body options
-        end
+        #{"move_query_to_body options" if method == "post"}
         connection.request(options)
       end
     DEF
@@ -174,6 +172,8 @@ module Jeff
   end
 
   def move_query_to_body(options)
+    return if options[:body]
+
     options[:headers] ||= {}
     options[:headers].store("Content-Type", "application/x-www-form-urlencoded")
     options.store(:body, options.delete(:query))
