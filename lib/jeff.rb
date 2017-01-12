@@ -175,7 +175,7 @@ module Jeff
     return if options[:body]
 
     options[:headers] ||= {}
-    options[:headers].store("Content-Type", "application/x-www-form-urlencoded")
+    options[:headers].store("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
     options.store(:body, options.delete(:query))
   end
 
