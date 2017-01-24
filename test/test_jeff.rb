@@ -141,6 +141,15 @@ class TestJeffInAction < Minitest::Test
     assert_nil res.body
   end
 
+  def test_sets_proper_encoding_header
+    Excon.stub({}) do |request_params|
+      { headers: request_params[:headers] }
+    end
+
+    res = @client.post(query: { foo: "bar" }, mock: true)
+    assert_includes res.headers["Content-Type"], "UTF-8"
+  end
+
   def test_gets_from_an_actual_endpoint
     @client.aws_endpoint = "https://mws.amazonservices.com/Sellers/2011-07-01"
     res = @client.post(query: { "Action" => "GetServiceStatus" })
