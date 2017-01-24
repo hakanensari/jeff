@@ -2,6 +2,10 @@ require "minitest/autorun"
 require "minitest/pride"
 require_relative "../lib/jeff"
 
+# We may need to set ciphers explicitly on jRuby
+# see https://github.com/jruby/warbler/issues/340
+Excon.defaults[:ciphers] = "DEFAULT" if RUBY_ENGINE == "jruby"
+
 class TestJeff < Minitest::Test
   def setup
     @klass = Class.new { include Jeff }
