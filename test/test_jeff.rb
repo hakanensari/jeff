@@ -72,6 +72,16 @@ class TestJeff < Minitest::Test
     assert_equal "CustomApp/1.0", client.connection.data[:headers]["User-Agent"]
   end
 
+  def test_escapes_space
+    assert_equal "%20", Jeff::Utils.escape(" ")
+    query = Jeff::Query.new("foo" => "bar baz")
+    assert_equal "foo=bar%20baz", query.to_s
+  end
+
+  def test_escapes_multibyte_character
+    assert_equal "%E2%80%A6", Jeff::Utils.escape("…")
+  end
+
   def test_does_not_escape_tilde
     assert_equal "~%2C", Jeff::Utils.escape("~,")
   end
