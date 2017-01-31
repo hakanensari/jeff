@@ -154,7 +154,8 @@ module Jeff
   def add_md5_digest(options)
     return unless options.key?(:body)
     md5 = Content.new(options[:body]).md5
-    (options[:headers] ||= {}).store("Content-MD5", md5)
+    query = options[:query] ||= {}
+    query.store("ContentMD5Value", md5)
   end
 
   def sign(options)

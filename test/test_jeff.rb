@@ -113,7 +113,7 @@ class TestJeffInAction < Minitest::Test
 
   def test_adds_content_md5_request_header_if_given_a_request_body
     Excon.stub({}) do |request_params|
-      { body: request_params[:headers]["Content-MD5"] }
+      { body: request_params[:query]["ContentMD5Value"] }
     end
     refute_empty @client.post(body: "foo", mock: true).body
   end
