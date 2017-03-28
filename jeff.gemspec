@@ -16,7 +16,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = Jeff::VERSION
 
-  gem.add_dependency "excon", ">= 0.22.1"
+  gem.add_dependency "excon"
   gem.add_development_dependency "minitest"
   gem.add_development_dependency "rake"
 
