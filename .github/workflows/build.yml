@@ -1,0 +1,17 @@
+name: build
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby: ["ruby:2.5", "ruby:2.6", "ruby:2.7", "jruby:9"]
+    container:
+      image: ${{ matrix.ruby }}
+    steps:
+    - uses: actions/checkout@v2
+    - run: gem install bundler
+    - run: bundle install --jobs 4 --retry 3
+    - run: bundle exec rake
