@@ -208,7 +208,7 @@ module Jeff
     # identify the application, its version number, programming language, and
     # host.
     def default_user_agent
-      "Jeff/#{VERSION} (Language=Ruby; #{`hostname`.chomp})"
+      "Jeff/#{VERSION} (Language=Ruby; #{Socket.gethostname})"
     end
   end
 end
