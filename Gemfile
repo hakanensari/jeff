@@ -1,4 +1,5 @@
-source "https://rubygems.org"
-gemspec
+# frozen_string_literal: true
 
-gem "rubysl", platform: :rbx
+source 'https://rubygems.org'
+gemspec
+gem 'jruby-openssl', platform: :jruby

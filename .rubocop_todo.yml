@@ -1,0 +1,4 @@
+Metrics/AbcSize:
+  Max: 18.28
+Security/Eval:
+  Enabled: false

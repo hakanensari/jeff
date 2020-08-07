@@ -1,12 +1,12 @@
-# Jeff's only external dependency.
-require "excon"
+# frozen_string_literal: true
 
-# Standard library dependencies.
-require "base64"
-require "openssl"
-require "time"
+require 'excon'
 
-require "jeff/version"
+require 'base64'
+require 'openssl'
+require 'time'
+
+require 'jeff/version'
 
 # Jeff mixes in client behaviour for Amazon Web Services (AWS) that require
 # Signature version 2 authentication.
@@ -22,7 +22,7 @@ module Jeff
     def to_s
       values
         .sort { |a, b| a[0].to_s <=> b[0].to_s }
-        .map { |k, v| "#{k}=#{Utils.escape(v)}" }.join("&")
+        .map { |k, v| "#{k}=#{Utils.escape(v)}" }.join('&')
     end
   end
 
@@ -61,7 +61,7 @@ module Jeff
 
   # Calculates an RFC 2104-compliant HMAC signature.
   class Signature
-    SHA256 = OpenSSL::Digest::SHA256.new
+    SHA256 = OpenSSL::Digest.new('SHA256')
 
     def initialize(secret)
       @secret = secret
@@ -72,18 +72,18 @@ module Jeff
     end
 
     def secret
-      @secret || fail(ArgumentError, "Missing secret")
+      @secret || raise(ArgumentError, 'Missing secret')
     end
   end
 
   # Because Ruby's CGI escapes tilde, use a custom escape.
   module Utils
-    UNRESERVED = /([^\w.~-]+)/
+    UNRESERVED = /([^\w.~-]+)/.freeze
 
     def self.escape(val)
       val.to_s.gsub(UNRESERVED) do
         match = Regexp.last_match[1]
-        "%" + match.unpack("H2" * match.bytesize).join("%").upcase
+        "%#{match.unpack('H2' * match.bytesize).join('%')}".upcase
       end
     end
   end
@@ -96,11 +96,13 @@ module Jeff
     # Add other common parameters using `Jeff.params` if required in your
     # implementation.
     base.params(
-      "AWSAccessKeyId"   => -> { aws_access_key_id },
-      "SignatureVersion" => "2",
-      "SignatureMethod"  => "HmacSHA256",
-      "Timestamp"        => -> { Time.now.utc.iso8601 }
+      'AWSAccessKeyId' => -> { aws_access_key_id },
+      'SignatureVersion' => '2',
+      'SignatureMethod' => 'HmacSHA256',
+      'Timestamp' => -> { Time.now.utc.iso8601 }
     )
+
+    super
   end
 
   # A reusable HTTP connection.
@@ -117,11 +119,11 @@ module Jeff
   attr_writer :aws_access_key_id, :aws_secret_access_key
 
   def aws_access_key_id
-    @aws_access_key_id || ENV["AWS_ACCESS_KEY_ID"]
+    @aws_access_key_id || ENV['AWS_ACCESS_KEY_ID']
   end
 
   def aws_secret_access_key
-    @aws_secret_access_key || ENV["AWS_SECRET_ACCESS_KEY"]
+    @aws_secret_access_key || ENV['AWS_SECRET_ACCESS_KEY']
   end
 
   def proxy=(url)
@@ -130,22 +132,22 @@ module Jeff
 
   # Generate HTTP request verb methods.
   Excon::HTTP_VERBS.each do |method|
-    eval <<-DEF
+    eval <<-RUBY, binding, __FILE__, __LINE__ + 1
       def #{method}(options = {})
         options.store(:method, :#{method})
         add_md5_digest options
         sign options
-        #{"move_query_to_body options" if method == "post"}
+        #{'move_query_to_body options' if method == 'post'}
         connection.request(options)
       end
-    DEF
+    RUBY
   end
 
   private
 
   def default_connection_params
     {
-      headers: { "User-Agent" => self.class.user_agent },
+      headers: { 'User-Agent' => self.class.user_agent },
       expects: 200,
       omit_default_port: true
     }
@@ -153,9 +155,10 @@ module Jeff
 
   def add_md5_digest(options)
     return unless options.key?(:body)
+
     md5 = Content.new(options[:body]).md5
     query = options[:query] ||= {}
-    query.store("ContentMD5Value", md5)
+    query.store('ContentMD5Value', md5)
   end
 
   def sign(options)
@@ -165,8 +168,8 @@ module Jeff
 
     # Generate signature.
     signature = Signer
-      .new(options[:method], connection.data[:host], options[:path] || connection.data[:path], query_string)
-      .sign_with(aws_secret_access_key)
+                .new(options[:method], connection.data[:host], options[:path] || connection.data[:path], query_string)
+                .sign_with(aws_secret_access_key)
 
     # Append escaped signature to query.
     options.store(:query, "#{query_string}&Signature=#{Utils.escape(signature)}")
@@ -176,20 +179,21 @@ module Jeff
     return if options[:body]
 
     options[:headers] ||= {}
-    options[:headers].store("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+    options[:headers].store('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8')
     options.store(:body, options.delete(:query))
   end
 
   def default_query_values
     self.class.params
-      .reduce({}) do |qv, (k, v)|
-        v = v.respond_to?(:call) ? instance_exec(&v) : v
+        .reduce({}) do |qv, (k, v)|
+      v = v.respond_to?(:call) ? instance_exec(&v) : v
 
-        # Ignore keys with nil values
-        v.nil? ? qv : qv.update(k => v)
-      end
+      # Ignore keys with nil values
+      v.nil? ? qv : qv.update(k => v)
+    end
   end
 
+  # Defines class-level methods
   module ClassMethods
     # Gets/updates default request parameters.
     def params(hsh = {})
