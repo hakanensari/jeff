@@ -11,6 +11,9 @@ require 'jeff/version'
 # Jeff mixes in client behaviour for Amazon Web Services (AWS) that require
 # Signature version 2 authentication.
 module Jeff
+  DEFAULT_CONNECT_TIMEOUT = 5.freeze
+  DEFAULT_READ_TIMEOUT = 60.freeze
+
   # Converts query field-value pairs to a sorted query string.
   class Query
     attr_reader :values
@@ -106,12 +109,15 @@ module Jeff
   end
 
   # A reusable HTTP connection.
-  def connection
-    @connection ||= Excon.new(aws_endpoint, connection_params)
+  def connection(options = {})
+    @connection ||= Excon.new(aws_endpoint, connection_params(options))
   end
 
-  def connection_params
-    @connection_params ||= default_connection_params
+  def connection_params(options = {})
+    @connection_params ||= default_connection_params.merge(
+      connect_timeout: options&.fetch(:connect_timeout, DEFAULT_CONNECT_TIMEOUT),
+      read_timeout: options&.fetch(:read_timeout, DEFAULT_READ_TIMEOUT)
+    ).compact
   end
 
   attr_accessor :aws_endpoint
@@ -138,7 +144,7 @@ module Jeff
         add_md5_digest options
         sign options
         #{'move_query_to_body options' if method == 'post'}
-        connection.request(options)
+        connection(options.delete(:connection)).request(options)
       end
     RUBY
   end

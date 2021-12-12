@@ -171,4 +171,15 @@ class TestJeffInAction < Minitest::Test
     @client.proxy = 'http://my.proxy:4321'
     assert @client.connection.proxy
   end
+
+  def test_default_timeout_options
+    assert_equal Jeff::DEFAULT_CONNECT_TIMEOUT, @client.connection.connection[:connect_timeout]
+    assert_equal Jeff::DEFAULT_READ_TIMEOUT, @client.connection.connection[:read_timeout]
+  end
+
+  def test_custom_timeout_options
+    @client.connection(connect_timeout: 2, read_timeout: 25)
+    assert_equal 2, @client.connection.connection[:connect_timeout]
+    assert_equal 25, @client.connection.connection[:read_timeout]
+  end
 end
